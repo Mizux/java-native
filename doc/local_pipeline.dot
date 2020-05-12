@@ -1,0 +1,72 @@
+@startdot
+digraph CMake {
+  rankdir=TD;
+  subgraph clusterLinux {
+    color=black;
+    label = "Host";
+    node [shape=note, style="rounded,filled", color=black, fillcolor=royalblue];
+    SWIG [label="foo.i", fillcolor=white];
+
+  subgraph clusterCPP {
+    color=royalblue;
+    label = "C++";
+    node [shape=note, style="rounded,filled", color=black, fillcolor=royalblue];
+    PKG [label="C++ dev packages\ne.g. cmake, g++", shape=box3d];
+    CPP [label="Foo.hpp/Foo.cpp"];
+    LIB [label="libFoo.so\nlinux-x86-64/", shape=component];
+
+    WRAPPER_CPP [label="fooJAVA_wrap.cxx"];
+    WRAPPER_OBJ [label="fooJAVA_wrap.cxx.o"];
+    WRAPPER_LIB [label="jnijavanative.so\nlinux-x86-64/", shape=component];
+
+    CPP -> WRAPPER_CPP [label="include", style=dashed];
+    CPP -> LIB [label="g++, ld", style=bold];
+    WRAPPER_CPP -> WRAPPER_OBJ [label="g++", style=bold];
+    WRAPPER_OBJ -> WRAPPER_LIB [label="ld", style=bold];
+
+    //PKG -> LIB [label="cmake", style=dashed];
+    //PKG -> WRAPPER_OBJ [label="cmake", style=dashed];
+  }
+
+  subgraph clusterJAVA {
+    color=crimson;
+    label = "Java";
+    node [shape=note, style="rounded,filled", color=black, fillcolor=crimson];
+    JAVA_PKG [label="Java SDK packages\ne.g. jdk, maven", shape=box3d, fillcolor=crimson];
+    NATIVE_POM [label="javanative-linux-x86-64/pom.xml"];
+    NATIVE_JAR [label="javanative-linux-x86-64.jar", shape=folder];
+
+    NATIVE_POM -> NATIVE_JAR [label="mvn package", style=bold];
+
+    LOADER_JAVA [label="Loader.java"];
+    FOO_JAVA [label="Foo.java"];
+    FOO_POM [label="javanative-java/pom.xml"];
+    FOO_CLS [label="Foo.class\n/org/mizux/javanative/foo/", shape=component];
+    FOO_JAR [label="javanative-java.jar", shape=folder];
+
+    LOADER_JAVA -> FOO_POM [label="src/main/java", style=dashed];
+    FOO_JAVA -> FOO_POM [label="src/main/java", style=dashed];
+    FOO_POM -> FOO_CLS [label="mvn compile", style=bold];
+    FOO_CLS -> FOO_JAR [label="pack", style=dashed];
+    FOO_POM -> FOO_JAR [label="mvn package", style=bold];
+
+    NATIVE_JAR -> FOO_JAR [label="dependency", style=dashed];
+    NATIVE_JAR -> FOO_POM [label="dependency", style=dashed];
+
+    //JAVA_PKG -> NATIVE_POM [label="cmake", style=dashed];
+    //JAVA_PKG -> FOO_POM [label="cmake", style=dashed];
+  }
+
+  CPP -> SWIG [label="include", style=dashed];
+  SWIG -> WRAPPER_CPP [label="swig", style=bold];
+  SWIG -> FOO_JAVA [label="swig", style=bold];
+
+  LIB -> NATIVE_POM [label="src/main/resources", style=dashed];
+  LIB -> NATIVE_JAR [label="pack", style=dashed];
+  WRAPPER_LIB -> NATIVE_POM [label="src/main/resources", style=dashed];
+  WRAPPER_LIB -> NATIVE_JAR [label="pack", style=dashed];
+  WRAPPER_LIB -> FOO_JAVA [label="call", style=dashed];
+  }
+}
+@enddot
+// vim: set tw=0 ts=2 sw=2 expandtab:

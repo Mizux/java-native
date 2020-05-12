@@ -1,0 +1,11 @@
+*.swp
+*.user
+
+build/
+cache/
+
+/ci/samples/java/target
+
+.vs/
+compile_commands.json
+.clangd
