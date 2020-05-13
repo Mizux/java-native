@@ -58,9 +58,9 @@ foreach(SUBPROJECT IN ITEMS Foo)
   target_link_libraries(jnijavanative PRIVATE jni${SUBPROJECT})
 endforeach()
 
-##########################
-##  Java Maven Package  ##
-##########################
+#################################
+##  Java Native Maven Package  ##
+#################################
 if(APPLE)
   set(NATIVE_IDENTIFIER darwin)
 elseif(UNIX)
@@ -104,7 +104,9 @@ add_custom_target(java_native_package
   COMMAND ${MAVEN_EXECUTABLE} install
   WORKING_DIRECTORY java/${CMAKE_SWIG_JAVA_NATIVE})
 
-# Pure Java Package
+##########################
+##  Java Maven Package  ##
+##########################
 configure_file(
   ${PROJECT_SOURCE_DIR}/java/pom-local.xml.in
   ${PROJECT_BINARY_DIR}/java/pom-local.xml.in
@@ -128,8 +130,7 @@ add_custom_target(java_package ALL
   COMMAND ${MAVEN_EXECUTABLE} compile
   COMMAND ${MAVEN_EXECUTABLE} package
   COMMAND ${MAVEN_EXECUTABLE} install
-  WORKING_DIRECTORY java/${CMAKE_SWIG_JAVA}
-  )
+  WORKING_DIRECTORY java/${CMAKE_SWIG_JAVA})
 
 ############
 ##  Test  ##
