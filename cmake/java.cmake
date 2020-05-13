@@ -25,7 +25,6 @@ if(UNIX)
 else()
   find_program(MAVEN_EXECUTABLE mvn.cmd)
 endif()
-
 if(NOT MAVEN_EXECUTABLE)
   message(FATAL_ERROR "Check for maven Program: not found")
 else()
@@ -72,21 +71,15 @@ else()
 endif()
 set(CMAKE_SWIG_JAVA_NATIVE ${CMAKE_SWIG_JAVA}.${NATIVE_IDENTIFIER})
 
-# pom*.xml.in contains:
-# CMake variable(s) (@PROJECT_NAME@) that configure_file() can manage and
-# generator expression ($<TARGET_FILE:...>) that file(GENERATE) can manage.
 configure_file(
   ${PROJECT_SOURCE_DIR}/java/pom-native.xml.in
   ${PROJECT_BINARY_DIR}/java/pom-native.xml.in
   @ONLY)
-file(GENERATE
-  OUTPUT ${PROJECT_BINARY_DIR}/java/$<CONFIG>/pom-native.xml
-  INPUT ${PROJECT_BINARY_DIR}/java/pom-native.xml.in)
 
 add_custom_command(
   OUTPUT java/${CMAKE_SWIG_JAVA_NATIVE}/pom.xml
   COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SWIG_JAVA_NATIVE}
-  COMMAND ${CMAKE_COMMAND} -E copy ./$<CONFIG>/pom-native.xml ${CMAKE_SWIG_JAVA_NATIVE}/pom.xml
+  COMMAND ${CMAKE_COMMAND} -E copy ./pom-native.xml.in ${CMAKE_SWIG_JAVA_NATIVE}/pom.xml
   BYPRODUCTS
   java/${CMAKE_SWIG_JAVA_NATIVE}
   WORKING_DIRECTORY java)
@@ -111,13 +104,10 @@ configure_file(
   ${PROJECT_SOURCE_DIR}/java/pom-local.xml.in
   ${PROJECT_BINARY_DIR}/java/pom-local.xml.in
   @ONLY)
-file(GENERATE
-  OUTPUT ${PROJECT_BINARY_DIR}/java/$<CONFIG>/pom-local.xml
-  INPUT ${PROJECT_BINARY_DIR}/java/pom-local.xml.in)
 
 add_custom_command(
   OUTPUT java/${CMAKE_SWIG_JAVA}/pom.xml
-  COMMAND ${CMAKE_COMMAND} -E copy ./$<CONFIG>/pom-local.xml ${CMAKE_SWIG_JAVA}/pom.xml
+  COMMAND ${CMAKE_COMMAND} -E copy ./pom-local.xml.in ${CMAKE_SWIG_JAVA}/pom.xml
   BYPRODUCTS
   java/${CMAKE_SWIG_JAVA}
   WORKING_DIRECTORY java)
@@ -141,13 +131,10 @@ if(BUILD_TESTING)
     ${PROJECT_SOURCE_DIR}/java/pom-test.xml.in
     ${PROJECT_BINARY_DIR}/java/pom-test.xml.in
     @ONLY)
-  file(GENERATE
-    OUTPUT ${PROJECT_BINARY_DIR}/java/$<CONFIG>/pom-test.xml
-    INPUT ${PROJECT_BINARY_DIR}/java/pom-test.xml.in)
 
   add_custom_command(
     OUTPUT java/${CMAKE_SWIG_JAVA_TEST}/pom.xml
-    COMMAND ${CMAKE_COMMAND} -E copy ./$<CONFIG>/pom-test.xml ${CMAKE_SWIG_JAVA_TEST}/pom.xml
+    COMMAND ${CMAKE_COMMAND} -E copy ./pom-test.xml.in ${CMAKE_SWIG_JAVA_TEST}/pom.xml
     BYPRODUCTS
     java/${CMAKE_SWIG_JAVA_TEST}
     WORKING_DIRECTORY java)
