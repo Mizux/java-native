@@ -50,16 +50,10 @@ elseif(UNIX)
   set_target_properties(jnijavanative PROPERTIES INSTALL_RPATH "$ORIGIN")
 endif()
 
-# Swig wrap all libraries
-set(CMAKE_SWIG_JAVA org.mizux.javanative)
-foreach(SUBPROJECT IN ITEMS Foo)
-  add_subdirectory(${SUBPROJECT}/java)
-  target_link_libraries(jnijavanative PRIVATE jni${SUBPROJECT})
-endforeach()
-
-#################################
-##  Java Native Maven Package  ##
-#################################
+# Needed by java/CMakeLists.txt
+set(JAVA_PACKAGE org.mizux.javanative)
+set(JAVA_PACKAGE_PATH src/main/java/org/mizux/javanative)
+set(JAVA_RESOURCES_PATH src/main/resources)
 if(APPLE)
   set(NATIVE_IDENTIFIER darwin)
 elseif(UNIX)
@@ -69,33 +63,43 @@ elseif(WIN32)
 else()
   message(FATAL_ERROR "Unsupported system !")
 endif()
-set(CMAKE_SWIG_JAVA_NATIVE ${CMAKE_SWIG_JAVA}.${NATIVE_IDENTIFIER})
+set(JAVA_NATIVE_PROJECT javanative-${NATIVE_IDENTIFIER})
+set(JAVA_PROJECT javanative-java)
 
+# Swig wrap all libraries
+foreach(SUBPROJECT IN ITEMS Foo)
+  add_subdirectory(${SUBPROJECT}/java)
+  target_link_libraries(jnijavanative PRIVATE jni${SUBPROJECT})
+endforeach()
+
+#################################
+##  Java Native Maven Package  ##
+#################################
 configure_file(
   ${PROJECT_SOURCE_DIR}/java/pom-native.xml.in
   ${PROJECT_BINARY_DIR}/java/pom-native.xml.in
   @ONLY)
 
 add_custom_command(
-  OUTPUT java/${CMAKE_SWIG_JAVA_NATIVE}/pom.xml
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SWIG_JAVA_NATIVE}
-  COMMAND ${CMAKE_COMMAND} -E copy ./pom-native.xml.in ${CMAKE_SWIG_JAVA_NATIVE}/pom.xml
+  OUTPUT java/${JAVA_NATIVE_PROJECT}/pom.xml
+	DEPENDS ${PROJECT_BINARY_DIR}/java/pom-native.xml.in
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_NATIVE_PROJECT}
+  COMMAND ${CMAKE_COMMAND} -E copy ./pom-native.xml.in ${JAVA_NATIVE_PROJECT}/pom.xml
   BYPRODUCTS
-  java/${CMAKE_SWIG_JAVA_NATIVE}
+  java/${JAVA_NATIVE_PROJECT}
   WORKING_DIRECTORY java)
 
 add_custom_target(java_native_package
   DEPENDS
-  jnijavanative
-  java/${CMAKE_SWIG_JAVA_NATIVE}/pom.xml
+  java/${JAVA_NATIVE_PROJECT}/pom.xml
   COMMAND ${CMAKE_COMMAND} -E remove_directory src
-  COMMAND ${CMAKE_COMMAND} -E make_directory src/main/resources/${NATIVE_IDENTIFIER}
-  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Foo> src/main/resources/${NATIVE_IDENTIFIER}/
-  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:jnijavanative> src/main/resources/${NATIVE_IDENTIFIER}/
+	COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_RESOURCES_PATH}/${NATIVE_IDENTIFIER}
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Foo> ${JAVA_RESOURCES_PATH}/${NATIVE_IDENTIFIER}/
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:jnijavanative> ${JAVA_RESOURCES_PATH}/${NATIVE_IDENTIFIER}/
   COMMAND ${MAVEN_EXECUTABLE} compile
   COMMAND ${MAVEN_EXECUTABLE} package
   COMMAND ${MAVEN_EXECUTABLE} install
-  WORKING_DIRECTORY java/${CMAKE_SWIG_JAVA_NATIVE})
+  WORKING_DIRECTORY java/${JAVA_NATIVE_PROJECT})
 
 ##########################
 ##  Java Maven Package  ##
@@ -106,26 +110,28 @@ configure_file(
   @ONLY)
 
 add_custom_command(
-  OUTPUT java/${CMAKE_SWIG_JAVA}/pom.xml
-  COMMAND ${CMAKE_COMMAND} -E copy ./pom-local.xml.in ${CMAKE_SWIG_JAVA}/pom.xml
+  OUTPUT java/${JAVA_PROJECT}/pom.xml
+	DEPENDS ${PROJECT_BINARY_DIR}/java/pom-local.xml.in
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_PROJECT}
+  COMMAND ${CMAKE_COMMAND} -E copy ./pom-local.xml.in ${JAVA_PROJECT}/pom.xml
   BYPRODUCTS
-  java/${CMAKE_SWIG_JAVA}
+  java/${JAVA_PROJECT}
   WORKING_DIRECTORY java)
 
 add_custom_target(java_package ALL
   DEPENDS
-  java_native_package
-  java/${CMAKE_SWIG_JAVA}/pom.xml
-  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/java/Loader.java src/main/java/org/mizux/javanative
+  java/${JAVA_PROJECT}/pom.xml
+	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/java/Loader.java ${JAVA_PACKAGE_PATH}/
   COMMAND ${MAVEN_EXECUTABLE} compile
   COMMAND ${MAVEN_EXECUTABLE} package
   COMMAND ${MAVEN_EXECUTABLE} install
-  WORKING_DIRECTORY java/${CMAKE_SWIG_JAVA})
+  WORKING_DIRECTORY java/${JAVA_PROJECT})
+add_dependencies(java_package java_native_package)
 
-############
-##  Test  ##
-############
-set(CMAKE_SWIG_JAVA_TEST ${CMAKE_SWIG_JAVA}.test)
+#################
+##  Java Test  ##
+#################
+set(JAVA_TEST_PROJECT javanative-test)
 if(BUILD_TESTING)
   configure_file(
     ${PROJECT_SOURCE_DIR}/java/pom-test.xml.in
@@ -133,25 +139,26 @@ if(BUILD_TESTING)
     @ONLY)
 
   add_custom_command(
-    OUTPUT java/${CMAKE_SWIG_JAVA_TEST}/pom.xml
-    COMMAND ${CMAKE_COMMAND} -E copy ./pom-test.xml.in ${CMAKE_SWIG_JAVA_TEST}/pom.xml
+		OUTPUT java/${JAVA_TEST_PROJECT}/pom.xml
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_TEST_PROJECT}
+    COMMAND ${CMAKE_COMMAND} -E copy ./pom-test.xml.in ${JAVA_TEST_PROJECT}/pom.xml
     BYPRODUCTS
-    java/${CMAKE_SWIG_JAVA_TEST}
+    java/${JAVA_TEST_PROJECT}
     WORKING_DIRECTORY java)
 
   add_custom_target(java_test_package ALL
     DEPENDS
-    java_package
-    java/${CMAKE_SWIG_JAVA_TEST}/pom.xml
+    java/${JAVA_TEST_PROJECT}/pom.xml
     COMMAND ${CMAKE_COMMAND} -E remove_directory src
-    COMMAND ${CMAKE_COMMAND} -E make_directory src/main/java/org/mizux/javanative
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/java/Test.java src/main/java/org/mizux/javanative
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_PACKAGE_PATH}
+		COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/java/Test.java ${JAVA_PACKAGE_PATH}/
     COMMAND ${MAVEN_EXECUTABLE} compile
     COMMAND ${MAVEN_EXECUTABLE} package
-    WORKING_DIRECTORY java/${CMAKE_SWIG_JAVA_TEST})
+		WORKING_DIRECTORY java/${JAVA_TEST_PROJECT})
+	add_dependencies(java_test_package java_package)
 
   add_test(
     NAME JavaTest
     COMMAND ${MAVEN_EXECUTABLE} exec:java -Dexec.mainClass=org.mizux.javanative.Test
-    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/java/${CMAKE_SWIG_JAVA_TEST})
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/java/${JAVA_TEST_PROJECT})
 endif()
