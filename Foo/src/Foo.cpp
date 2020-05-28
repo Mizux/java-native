@@ -86,7 +86,7 @@ int pairVectorInput(std::vector<std::pair<int, int>> data) {
   std::cout << "Enter " << __func__ << "()" << std::endl;
   std::cout << "{";
   for (const auto& item : data) {
-    std::cout << "["<< item.first << "," << item.second  << "], ";
+    std::cout << "[" << item.first << "," << item.second << "], ";
   }
   std::cout << "}" << std::endl;
   std::cout << "Exit " << __func__ << "()" << std::endl;
@@ -97,7 +97,7 @@ int pairVectorRefInput(const std::vector<std::pair<int, int>>& data) {
   std::cout << "Enter " << __func__ << "()" << std::endl;
   std::cout << "{";
   for (const auto& item : data) {
-    std::cout << "["<< item.first << "," << item.second  << "], ";
+    std::cout << "[" << item.first << "," << item.second << "], ";
   }
   std::cout << "}" << std::endl;
   std::cout << "Exit " << __func__ << "()" << std::endl;
@@ -121,7 +121,7 @@ int pairJaggedArrayInput(std::vector<std::vector<std::pair<int, int>>> data) {
   for (const auto& inner : data) {
     std::cout << "{";
     for (const auto& item : inner) {
-      std::cout << "["<< item.first << "," << item.second  << "], ";
+      std::cout << "[" << item.first << "," << item.second << "], ";
     }
     std::cout << "}, ";
   }
@@ -136,7 +136,7 @@ int pairJaggedArrayRefInput(const std::vector<std::vector<std::pair<int, int>>>&
   for (const auto& inner : data) {
     std::cout << "{";
     for (const auto& item : inner) {
-      std::cout << "["<< item.first << "," << item.second  << "], ";
+      std::cout << "[" << item.first << "," << item.second << "], ";
     }
     std::cout << "}, ";
   }

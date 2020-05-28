@@ -42,8 +42,8 @@ TEST_CASE("String Jagged Array usage", "[Foo]") {
     for (int i = 0; i < result.size(); ++i) {
       REQUIRE(i + 1 == result[i].size());
     }
-    for (int i=1; i <= result.size(); ++i) {
-      const auto& inner = result[i-1];
+    for (int i = 1; i <= result.size(); ++i) {
+      const auto& inner = result[i - 1];
       for (const auto& it : inner) {
         REQUIRE(it == std::to_string(i));
       }
@@ -94,8 +94,8 @@ TEST_CASE("Pair Jagged Array usage", "[Foo]") {
     for (int i = 0; i < result.size(); ++i) {
       REQUIRE(i + 1 == result[i].size());
     }
-    for (int i=1; i <= result.size(); ++i) {
-      const auto& inner = result[i-1];
+    for (int i = 1; i <= result.size(); ++i) {
+      const auto& inner = result[i - 1];
       for (const auto& it : inner) {
         REQUIRE(it == std::make_pair(i, i));
       }

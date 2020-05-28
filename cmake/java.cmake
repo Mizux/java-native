@@ -11,12 +11,9 @@ if(UNIX AND NOT APPLE)
   list(APPEND CMAKE_SWIG_FLAGS "-DSWIGWORDSIZE64")
 endif()
 
-# Find java
-find_package(Java COMPONENTS Development REQUIRED)
-message(STATUS "Found Java: ${Java_JAVA_EXECUTABLE} (found version \"${Java_VERSION_STRING}\")")
-
+# Find Java
+find_package(Java 1.8 COMPONENTS Development REQUIRED)
 find_package(JNI REQUIRED)
-message(STATUS "Found JNI: ${JNI_FOUND}")
 
 # Find maven
 # On windows mvn spawn a process while mvn.cmd is a blocking command
@@ -82,7 +79,7 @@ configure_file(
 
 add_custom_command(
   OUTPUT java/${JAVA_NATIVE_PROJECT}/pom.xml
-	DEPENDS ${PROJECT_BINARY_DIR}/java/pom-native.xml.in
+  DEPENDS ${PROJECT_BINARY_DIR}/java/pom-native.xml.in
   COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_NATIVE_PROJECT}
   COMMAND ${CMAKE_COMMAND} -E copy ./pom-native.xml.in ${JAVA_NATIVE_PROJECT}/pom.xml
   BYPRODUCTS
@@ -93,7 +90,7 @@ add_custom_target(java_native_package
   DEPENDS
   java/${JAVA_NATIVE_PROJECT}/pom.xml
   COMMAND ${CMAKE_COMMAND} -E remove_directory src
-	COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_RESOURCES_PATH}/${NATIVE_IDENTIFIER}
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_RESOURCES_PATH}/${NATIVE_IDENTIFIER}
   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Foo> ${JAVA_RESOURCES_PATH}/${NATIVE_IDENTIFIER}/
   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:jnijavanative> ${JAVA_RESOURCES_PATH}/${NATIVE_IDENTIFIER}/
   COMMAND ${MAVEN_EXECUTABLE} compile
@@ -111,7 +108,7 @@ configure_file(
 
 add_custom_command(
   OUTPUT java/${JAVA_PROJECT}/pom.xml
-	DEPENDS ${PROJECT_BINARY_DIR}/java/pom-local.xml.in
+  DEPENDS ${PROJECT_BINARY_DIR}/java/pom-local.xml.in
   COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_PROJECT}
   COMMAND ${CMAKE_COMMAND} -E copy ./pom-local.xml.in ${JAVA_PROJECT}/pom.xml
   BYPRODUCTS
@@ -121,7 +118,7 @@ add_custom_command(
 add_custom_target(java_package ALL
   DEPENDS
   java/${JAVA_PROJECT}/pom.xml
-	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/java/Loader.java ${JAVA_PACKAGE_PATH}/
+  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/java/Loader.java ${JAVA_PACKAGE_PATH}/
   COMMAND ${MAVEN_EXECUTABLE} compile
   COMMAND ${MAVEN_EXECUTABLE} package
   COMMAND ${MAVEN_EXECUTABLE} install
@@ -139,8 +136,8 @@ if(BUILD_TESTING)
     @ONLY)
 
   add_custom_command(
-		OUTPUT java/${JAVA_TEST_PROJECT}/pom.xml
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_TEST_PROJECT}
+    OUTPUT java/${JAVA_TEST_PROJECT}/pom.xml
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_TEST_PROJECT}
     COMMAND ${CMAKE_COMMAND} -E copy ./pom-test.xml.in ${JAVA_TEST_PROJECT}/pom.xml
     BYPRODUCTS
     java/${JAVA_TEST_PROJECT}
@@ -150,12 +147,12 @@ if(BUILD_TESTING)
     DEPENDS
     java/${JAVA_TEST_PROJECT}/pom.xml
     COMMAND ${CMAKE_COMMAND} -E remove_directory src
-		COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_PACKAGE_PATH}
-		COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/java/Test.java ${JAVA_PACKAGE_PATH}/
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_PACKAGE_PATH}
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/java/Test.java ${JAVA_PACKAGE_PATH}/
     COMMAND ${MAVEN_EXECUTABLE} compile
     COMMAND ${MAVEN_EXECUTABLE} package
-		WORKING_DIRECTORY java/${JAVA_TEST_PROJECT})
-	add_dependencies(java_test_package java_package)
+    WORKING_DIRECTORY java/${JAVA_TEST_PROJECT})
+  add_dependencies(java_test_package java_package)
 
   add_test(
     NAME JavaTest

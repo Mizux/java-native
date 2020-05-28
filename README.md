@@ -109,20 +109,20 @@ Here some dev-note concerning this `POM.xml`.
 - Add runtime dependency on each native package(s) availabe:
   ```xml
   <dependency>
-  	<groupId>org.mizux.javanative</groupId>
-  	<artifactId>javanative-linux-x86-64</artifactId>
-  	<version>1.0</version>
-  	<type>jar</type>
-  	<scope>runtime</scope>
+    <groupId>org.mizux.javanative</groupId>
+    <artifactId>javanative-linux-x86-64</artifactId>
+    <version>1.0</version>
+    <type>jar</type>
+    <scope>runtime</scope>
   </dependency>
-	```
-- Add dependency to jna so we can find at runtime the current `<platform>`:
+  ```
+  - Add dependency to jna so we can find at runtime the current `<platform>`:
   ```xml
-	<dependency>
-		<groupId>net.java.dev.jna</groupId>
-		<artifactId>jna-platform</artifactId>
-		<version>5.5.0</version>
-	</dependency>
+  <dependency>
+    <groupId>net.java.dev.jna</groupId>
+    <artifactId>jna-platform</artifactId>
+    <version>5.5.0</version>
+  </dependency>
   ```
 
 Then you can generate the package using:
@@ -137,7 +137,7 @@ If everything good the package (located in `<buildir>/java/org.mizux.javanative/
 {...}/packages/Mizux.Foo.nupkg:
 \- org/
    \- mizux/
-	    \- javanative/
+      \- javanative/
          \- Loader$PathConsumer.class
          \- Loader$1.class
          \- Loader.class
