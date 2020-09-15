@@ -9,12 +9,13 @@ import org.mizux.javanative.foo.IntPair;
 import org.mizux.javanative.foo.PairVector;
 import org.mizux.javanative.foo.PairJaggedArray;
 import java.util.AbstractList;
+import org.junit.jupiter.api.Test;
 
-/**
- * @author Mizux
- */
-public class Test {
-  private static void testFreeFunctions() {
+/** @author Mizux */
+public class FooTest {
+  @Test
+  public void testFreeFunctions() {
+    Loader.loadNativeLibraries();
     try {
       Globals.freeFunction(32);
       Globals.freeFunction((long)64);
@@ -23,7 +24,9 @@ public class Test {
     }
   }
 
-  private static void testStaticMethods() {
+  @Test
+  public void testStaticMethods() {
+    Loader.loadNativeLibraries();
     try {
       Foo.staticFunction(32);
       Foo.staticFunction((long)64);
@@ -32,7 +35,9 @@ public class Test {
     }
   }
 
-  private static void testStringVector() {
+  @Test
+  public void testStringVector() {
+    Loader.loadNativeLibraries();
     try {
       {
         StringVector result = Globals.stringVectorOutput(5);
@@ -57,7 +62,9 @@ public class Test {
     }
   }
 
-  private static void testStringJaggedArray() {
+  @Test
+  public void testStringJaggedArray() {
+    Loader.loadNativeLibraries();
     try {
       {
         AbstractList<StringVector> result = Globals.stringJaggedArrayOutput(5);
@@ -85,7 +92,9 @@ public class Test {
     }
   }
 
-  private static void testPairVector() {
+  @Test
+  public void testPairVector() {
+    Loader.loadNativeLibraries();
     try {
       {
         PairVector result = Globals.pairVectorOutput(5);
@@ -112,7 +121,9 @@ public class Test {
     }
   }
 
-  private static void testPairJaggedArray() {
+  @Test
+  public void testPairJaggedArray() {
+    Loader.loadNativeLibraries();
     try {
       {
         AbstractList<PairVector> result = Globals.pairJaggedArrayOutput(5);
@@ -140,7 +151,9 @@ public class Test {
     }
   }
 
-  private static void testFoo() {
+  @Test
+  public void testFoo() {
+    Loader.loadNativeLibraries();
     try {
       Foo f = new Foo();
       f.setInt(32);
@@ -151,20 +164,6 @@ public class Test {
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }
-  }
-
-  public static void main(String[] args) {
-    Loader.loadNativeLibraries();
-    testFreeFunctions();
-    testStaticMethods();
-
-    testStringVector();
-    testStringJaggedArray();
-
-    testPairVector();
-    testPairJaggedArray();
-
-    testFoo();
   }
 }
 
