@@ -1,5 +1,8 @@
 package org.mizux.javanative;
 
+import java.lang.ref.WeakReference;
+import java.util.AbstractList;
+
 import org.mizux.javanative.Loader;
 import org.mizux.javanative.foo.Foo;
 import org.mizux.javanative.foo.Globals;
@@ -8,8 +11,11 @@ import org.mizux.javanative.foo.StringJaggedArray;
 import org.mizux.javanative.foo.IntPair;
 import org.mizux.javanative.foo.PairVector;
 import org.mizux.javanative.foo.PairJaggedArray;
-import java.util.AbstractList;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /** @author Mizux */
 public class FooTest {
@@ -157,13 +163,38 @@ public class FooTest {
     try {
       Foo f = new Foo();
       f.setInt(32);
-      System.out.printf("Foo int: %d\n", f.getInt());
+      assertEquals(32, f.getInt());
 
       f.setInt64((long)64);
-      System.out.printf("Foo int64: %d\n", f.getInt64());
+      assertEquals(64, f.getInt64());
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }
   }
-}
 
+  private static void gc() {
+    Object obj = new Object();
+    WeakReference ref = new WeakReference<Object>(obj);
+    obj = null;
+    while(ref.get() != null) {
+      System.gc();
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = { false, true })
+  public void testFooGC(boolean enableGC) throws Exception {
+    Loader.loadNativeLibraries();
+    Foo f = new Foo();
+    f.setInt(32);
+    f.setInt64((long)64);
+    if (enableGC) {
+      gc();
+    }
+    assertEquals(32, f.getInt());
+    assertEquals(64, f.getInt64());
+    if (enableGC) {
+      gc();
+    }
+  }
+}
