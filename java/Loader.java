@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,9 +24,7 @@ public class Loader {
     String resource = Platform.RESOURCE_PREFIX + "/";
     URL resourceURL = loader.getResource(resource);
     Objects.requireNonNull(resourceURL,
-        String.format("Resource %s was not found in ClassLoader %s",
-          resource,
-          loader));
+        String.format("Resource %s was not found in ClassLoader %s", resource, loader));
 
     URI resourceURI;
     try {
@@ -41,7 +40,8 @@ public class Loader {
     void accept(Path path) throws T;
   }
 
-  /** Extract native resources in a temp directory.
+  /**
+   * Extract native resources in a temp directory.
    * @param resourceURI Native resource location.
    * @return The directory path containing all extracted libraries.
    */
@@ -61,7 +61,8 @@ public class Loader {
       }
 
       @Override
-      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+          throws IOException {
         Path newPath = tempPath.resolve(sourcePath.getParent().relativize(dir).toString());
         Files.copy(dir, newPath);
         newPath.toFile().deleteOnExit();
@@ -69,7 +70,15 @@ public class Loader {
       }
     });
 
-    FileSystem fs = FileSystems.newFileSystem(resourceURI, Collections.emptyMap());
+    FileSystem fs;
+    try {
+      fs = FileSystems.newFileSystem(resourceURI, Collections.emptyMap());
+    } catch (FileSystemAlreadyExistsException e) {
+      fs = FileSystems.getFileSystem(resourceURI);
+      if (fs == null) {
+        throw new IllegalArgumentException();
+      }
+    }
     Path p = fs.provider().getPath(resourceURI);
     visitor.accept(p);
     return tempPath;
@@ -78,13 +87,12 @@ public class Loader {
   /** Unpack and Load the native libraries needed for using ortools-java.*/
   private static boolean loaded = false;
   public static void loadNativeLibraries() {
-    if(!loaded) {
+    if (!loaded) {
       try {
         URI resourceURI = getNativeResourceURI();
         Path tempPath = unpackNativeResources(resourceURI);
         // Load the native library
-        System.load(
-            tempPath.resolve(Platform.RESOURCE_PREFIX)
+        System.load(tempPath.resolve(Platform.RESOURCE_PREFIX)
             .resolve(System.mapLibraryName("jnijavanative"))
             .toString());
         loaded = true;
@@ -94,4 +102,3 @@ public class Loader {
     }
   }
 }
-
