@@ -16,19 +16,20 @@ RUN wget "https://cmake.org/files/v3.19/cmake-3.19.2-Linux-x86_64.sh" \
 && ./cmake-3.19.2-Linux-x86_64.sh --prefix=/usr/local/ --skip-license \
 && rm cmake-3.19.2-Linux-x86_64.sh
 
+# Install SWIG 4.0.2
 RUN dnf -y update \
 && dnf -y install pcre-devel \
 && dnf clean all \
 && rm -rf /var/cache/dnf \
-&& wget "https://downloads.sourceforge.net/project/swig/swig/swig-4.0.1/swig-4.0.1.tar.gz" \
-&& tar xvf swig-4.0.1.tar.gz \
-&& rm swig-4.0.1.tar.gz \
-&& cd swig-4.0.1 \
+&& wget "https://downloads.sourceforge.net/project/swig/swig/swig-4.0.2/swig-4.0.2.tar.gz" \
+&& tar xvf swig-4.0.2.tar.gz \
+&& rm swig-4.0.2.tar.gz \
+&& cd swig-4.0.2 \
 && ./configure --prefix=/usr \
 && make -j 4 \
 && make install \
 && cd .. \
-&& rm -rf swig-4.0.1
+&& rm -rf swig-4.0.2
 
 # Java install
 RUN dnf -y update \
