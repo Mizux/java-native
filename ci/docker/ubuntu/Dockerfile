@@ -13,24 +13,26 @@ RUN wget "https://cmake.org/files/v3.17/cmake-3.17.2-Linux-x86_64.sh" \
 && chmod a+x cmake-3.17.2-Linux-x86_64.sh \
 && ./cmake-3.17.2-Linux-x86_64.sh --prefix=/usr/local/ --skip-license \
 && rm cmake-3.17.2-Linux-x86_64.sh
+
 # Install swig
 RUN apt-get update -qq \
 && apt-get install -yq swig \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 # Java install
 RUN apt-get update -qq \
 && DEBIAN_FRONTEND=noninteractive apt-get install -yq default-jdk maven \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 ENV JAVA_HOME=/usr/lib/jvm/default-java
-CMD [ "/usr/bin/bash" ]
 
 FROM env AS devel
 WORKDIR /home/project
 COPY . .
 
 FROM devel AS build
+RUN cmake -version
 RUN cmake -S. -Bbuild
 RUN cmake --build build --target all -v
 RUN cmake --build build --target install -v

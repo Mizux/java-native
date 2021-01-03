@@ -15,6 +15,7 @@ RUN wget "https://cmake.org/files/v3.17/cmake-3.17.2-Linux-x86_64.sh" \
 && ./cmake-3.17.2-Linux-x86_64.sh --prefix=/usr/local/ --skip-license \
 && rm cmake-3.17.2-Linux-x86_64.sh
 # Install swig
+
 RUN dnf -y update \
 && dnf -y install pcre-devel \
 && dnf clean all \
@@ -28,18 +29,20 @@ RUN dnf -y update \
 && make install \
 && cd .. \
 && rm -rf swig-4.0.1
+
 # Java install
 RUN dnf -y update \
 && dnf -y install java-1.8.0-openjdk java-1.8.0-openjdk-devel maven \
 && dnf clean all \
 && rm -rf /var/cache/dnf
-CMD [ "/usr/bin/bash" ]
 
+# Add the library src to our build env
 FROM env AS devel
 WORKDIR /home/project
 COPY . .
 
 FROM devel AS build
+RUN cmake -version
 RUN cmake -S. -Bbuild
 RUN cmake --build build --target all -v
 RUN cmake --build build --target install -v

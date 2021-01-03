@@ -5,18 +5,21 @@ LABEL maintainer="mizux.dev@gmail.com"
 # Install system build dependencies
 ENV PATH=/usr/local/bin:$PATH
 RUN pacman -Syu --noconfirm git base-devel cmake
+
 # Install swig
 RUN pacman -Syu --noconfirm swig
+
 # Java install
 RUN pacman -Syu --noconfirm jdk-openjdk maven
 ENV JAVA_HOME=/usr/lib/jvm/default
-CMD [ "/bin/bash" ]
 
+# Add the library src to our build env
 FROM env AS devel
 WORKDIR /home/project
 COPY . .
 
 FROM devel AS build
+RUN cmake -version
 RUN cmake -S. -Bbuild
 RUN cmake --build build --target all -v
 RUN cmake --build build --target install -v
