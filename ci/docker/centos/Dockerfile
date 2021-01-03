@@ -9,12 +9,12 @@ RUN dnf -y update \
 && dnf -y groupinstall "Development Tools" \
 && dnf clean all \
 && rm -rf /var/cache/dnf
-# Install CMake 3.17.2
-RUN wget "https://cmake.org/files/v3.17/cmake-3.17.2-Linux-x86_64.sh" \
-&& chmod a+x cmake-3.17.2-Linux-x86_64.sh \
-&& ./cmake-3.17.2-Linux-x86_64.sh --prefix=/usr/local/ --skip-license \
-&& rm cmake-3.17.2-Linux-x86_64.sh
-# Install swig
+
+# Install CMake 3.19.2
+RUN wget "https://cmake.org/files/v3.19/cmake-3.19.2-Linux-x86_64.sh" \
+&& chmod a+x cmake-3.19.2-Linux-x86_64.sh \
+&& ./cmake-3.19.2-Linux-x86_64.sh --prefix=/usr/local/ --skip-license \
+&& rm cmake-3.19.2-Linux-x86_64.sh
 
 RUN dnf -y update \
 && dnf -y install pcre-devel \
