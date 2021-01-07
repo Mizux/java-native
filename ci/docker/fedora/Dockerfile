@@ -19,7 +19,7 @@ RUN dnf -y update \
 RUN dnf -y update \
 && dnf -y install java-1.8.0-openjdk-devel maven \
 && dnf clean all
-ENV JAVA_HOME=/usr/lib/jvm/jre-1.8.0-openjdk
+ENV JAVA_HOME=/usr/lib/jvm/java-openjdk
 
 # Add the library src to our build env
 FROM env AS devel
