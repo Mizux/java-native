@@ -85,11 +85,11 @@ class Foo {
   //! @{
 
   /*! @brief Static method of Foo class.
-   * @param level Scope level.*/
+   * @param[in] level Scope level.*/
   static void staticFunction(int level);
 
   /*! @brief Static method of Foo class.
-   * @param level Scope level.*/
+   * @param[in] level Scope level.*/
   static void staticFunction(int64_t level);
 
   //! @}
@@ -101,7 +101,7 @@ class Foo {
    * @return A member value.*/
   int getInt() const;
   /*! @brief Method (setter) of Foo class.
-   * @param input A member value.*/
+   * @param[in] input A member value.*/
   void setInt(int input);
 
   //! @}
@@ -113,7 +113,7 @@ class Foo {
    * @return A member value.*/
   int64_t getInt64() const;
   /*! @brief Method (setter) of Foo class.
-   * @param input A member value.*/
+   * @param[in] input A member value.*/
   void setInt64(int64_t input);
 
   //! @}
