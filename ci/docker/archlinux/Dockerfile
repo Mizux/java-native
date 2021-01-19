@@ -26,3 +26,16 @@ RUN cmake --build build --target install -v
 
 FROM build AS test
 RUN cmake --build build --target test -v
+
+FROM env AS install_env
+WORKDIR /home/sample
+COPY --from=build /home/project/build/dotnet/packages/*.nupkg ./
+
+FROM install_env AS install_devel
+COPY ci/samples .
+
+FROM install_devel AS install_build
+RUN dotnet build
+
+FROM install_build AS install_test
+RUN dotnet test
