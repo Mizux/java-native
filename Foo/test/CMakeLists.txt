@@ -17,4 +17,4 @@ endif()
 target_link_libraries(${NAME}
   PRIVATE
   Catch2 ${PROJECT_NAMESPACE}::Foo)
-add_test(NAME ${NAME} COMMAND ${NAME})
+add_test(NAME cxx_${NAME} COMMAND ${NAME})
