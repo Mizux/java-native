@@ -2,7 +2,6 @@ add_library(Foo "")
 target_sources(Foo
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/foo/Foo.hpp>
-    $<INSTALL_INTERFACE:include/foo/Foo.hpp>
   PRIVATE
     src/Foo.cpp
   )
@@ -24,4 +23,7 @@ if(BUILD_TESTING)
 endif()
 
 # Install
-install(TARGETS Foo EXPORT ${PROJECT_NAME}Targets)
+install(TARGETS Foo
+  EXPORT ${PROJECT_NAME}Targets
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/foo
+  )
