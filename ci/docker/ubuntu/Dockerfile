@@ -28,6 +28,7 @@ RUN apt-get update -qq \
 && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 ENV JAVA_HOME=/usr/lib/jvm/default-java
 
+# Add the library src to our build env
 FROM env AS devel
 WORKDIR /home/project
 COPY . .

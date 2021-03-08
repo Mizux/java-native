@@ -29,6 +29,7 @@ RUN wget "https://downloads.sourceforge.net/project/swig/swig/swig-4.0.1/swig-4.
 && make install \
 && cd .. \
 && rm -rf swig-4.0.1
+
 # Java install
 RUN apt-get update -qq \
 && apt-get install -yq default-jdk maven \
