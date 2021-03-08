@@ -1,8 +1,22 @@
 #!/usr/bin/env bash
-set -eux
+set -euxo pipefail
 
-rm -f ./*.svg ./*.png
-for i in *.dot; do
-  #plantuml -Tpng "$i";
-  plantuml -Tsvg "$i";
+# Check plantuml is in PATH
+command -v plantuml
+
+# Output
+PNG=false
+SVG=true
+
+for i in ./*.dot; do
+  if $PNG; then
+    rm -f "${i%.dot}.png"
+    plantuml -Tpng "$i";
+  fi
+
+  if $SVG; then
+    rm -f "${i%.dot}.svg"
+    plantuml -Tsvg "$i";
+  fi
 done
+
