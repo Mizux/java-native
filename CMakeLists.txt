@@ -4,6 +4,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 option(CMAKE_EXPORT_COMPILE_COMMANDS "Export compile command" TRUE)
 
+option(SKIP_GPG "Skip gpg sign" OFF)
+
 project(JavaNative VERSION 1.0 LANGUAGES CXX)
 set(PROJECT_NAMESPACE jn)
 message(STATUS "project: ${PROJECT_NAME}")

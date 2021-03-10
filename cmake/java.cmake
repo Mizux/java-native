@@ -93,9 +93,9 @@ add_custom_target(java_native_package
   COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_RESOURCES_PATH}/${NATIVE_IDENTIFIER}
   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Foo> ${JAVA_RESOURCES_PATH}/${NATIVE_IDENTIFIER}/
   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:jnijavanative> ${JAVA_RESOURCES_PATH}/${NATIVE_IDENTIFIER}/
-  COMMAND ${MAVEN_EXECUTABLE} compile
-  COMMAND ${MAVEN_EXECUTABLE} package
-  COMMAND ${MAVEN_EXECUTABLE} install
+  COMMAND ${MAVEN_EXECUTABLE} compile -B
+  COMMAND ${MAVEN_EXECUTABLE} package -B
+  COMMAND ${MAVEN_EXECUTABLE} install -B $<$<BOOL:${SKIP_GPG}>:-Dgpg.skip=true>
   WORKING_DIRECTORY java/${JAVA_NATIVE_PROJECT})
 
 ##########################
@@ -119,9 +119,9 @@ add_custom_target(java_package ALL
   DEPENDS
   java/${JAVA_PROJECT}/pom.xml
   COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/java/Loader.java ${JAVA_PACKAGE_PATH}/
-  COMMAND ${MAVEN_EXECUTABLE} compile
-  COMMAND ${MAVEN_EXECUTABLE} package
-  COMMAND ${MAVEN_EXECUTABLE} install
+  COMMAND ${MAVEN_EXECUTABLE} compile -B
+  COMMAND ${MAVEN_EXECUTABLE} package -B
+  COMMAND ${MAVEN_EXECUTABLE} install -B $<$<BOOL:${SKIP_GPG}>:-Dgpg.skip=true>
   WORKING_DIRECTORY java/${JAVA_PROJECT})
 add_dependencies(java_package java_native_package)
 
