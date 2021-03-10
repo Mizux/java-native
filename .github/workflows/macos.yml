@@ -22,7 +22,7 @@ jobs:
     - name: Check mvn
       run: mvn --version
     - name: Configure
-      run: cmake -S. -Bbuild -G "Xcode" -DCMAKE_CONFIGURATION_TYPES=Release
+      run: cmake -S. -Bbuild -G "Xcode" -DCMAKE_CONFIGURATION_TYPES=Release -DSKIP_GPG=ON
     - name: Build
       run: cmake --build build --config Release --target ALL_BUILD -v
     - name: Test
@@ -42,7 +42,7 @@ jobs:
     - name: Check mvn
       run: mvn --version
     - name: Configure
-      run: cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      run: cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release -DSKIP_GPG=ON
     - name: Build
       run: cmake --build build --target all -v
     - name: Test

@@ -35,7 +35,7 @@ jobs:
     - name: Check mvn
       run: mvn --version
     - name: Configure
-      run: cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      run: cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release -DSKIP_GPG=ON
     - name: Build
       run: cmake --build build --config Release --target all -v
     - name: Test
