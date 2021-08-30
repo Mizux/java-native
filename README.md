@@ -43,8 +43,7 @@ The project layout is as follow:
 
 * [CMakeLists.txt](CMakeLists.txt) Top-level for [CMake](https://cmake.org/cmake/help/latest/) based build.
 * [cmake](cmake) Subsidiary CMake files.
-
-* [ci](ci) Root directory for continuous integration.
+  * [java.cmake](cmake/java.cmake) All internall Java CMake stuff.
 
 * [Foo](Foo) Root directory for `Foo` library.
   * [CMakeLists.txt](Foo/CMakeLists.txt) for `Foo`.
@@ -56,6 +55,7 @@ The project layout is as follow:
     * [foo.i](Foo/java/foo.i) SWIG Java wrapper.
   * [src](Foo/src) private folder.
     * [src/Foo.cpp](Foo/src/Foo.cpp)
+
 * [java](java) Root directory for Java template files
   * [base.i](java/base.i) Generic SWIG stuff (e.g. fixing int64 java typemaps).
   * [pom-native.xml.in](java/) POM template to build the native project.
@@ -63,6 +63,8 @@ The project layout is as follow:
   * [pom-local.xml.in](java/pom-local.xml.in) POM template to build the "pure" Java project.
   * [Test.java](java/Test.java) Test source code to verify the Java wrapper is working.
   * [pom-test.xml.in](java/pom-test.xml.in) POM template to build the test project.
+
+* [ci](ci) Root directory for continuous integration.
 
 ## Build Process
 
