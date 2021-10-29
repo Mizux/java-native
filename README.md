@@ -37,6 +37,9 @@ Then you want to provide a cross-platform Maven package to consume it in a Maven
 
 You'll need a "Java SDK >= 1.8" and "Maven >= 3.6".
 
+Please verify you have the `JAVA_HOME` environment variable set otherwise CMake
+and Maven won't be able to find your Java SDK.
+
 ## Directory Layout
 
 The project layout is as follow:
