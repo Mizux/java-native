@@ -26,13 +26,14 @@ COPY . .
 
 FROM devel AS build
 RUN cmake -version
-RUN cmake -S. -Bbuild -DSKIP_GPG=ON
+RUN cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release -DSKIP_GPG=ON
 RUN cmake --build build --target all -v
 RUN cmake --build build --target install -v
 
 FROM build AS test
 RUN cmake --build build --target test -v
 
+# Test install rules
 FROM env AS install_env
 COPY --from=build /home/project/build/java/javanative-linux-x86-64/target/*.jar ./
 RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file \
@@ -42,7 +43,7 @@ RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file \
  -Dfile=javanative-java-1.0.jar
 
 FROM install_env AS install_devel
-WORKDIR /home/sample
+WORKDIR /home/samples
 COPY ci/samples .
 
 FROM install_devel AS install_build
