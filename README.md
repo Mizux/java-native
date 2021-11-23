@@ -1,63 +1,88 @@
-[![Build Status][docker_status]][docker_link]
-[![Status][linux_svg]][linux_link]
-[![Status][osx_svg]][osx_link]
-[![Status][win_svg]][win_link]
+Github-CI:
+[![Build Status][github_linux_status]][github_linux_link]
+[![Build Status][github_macos_status]][github_macos_link]
+[![Build Status][github_windows_status]][github_windows_link]
+[![Build Status][github_amd64_docker_status]][github_amd64_docker_link]
 
-[docker_status]: https://github.com/Mizux/java-native/workflows/Docker/badge.svg
-[docker_link]: https://github.com/Mizux/java-native/actions?query=workflow%3A"Docker"
-[linux_svg]: https://github.com/Mizux/java-native/workflows/Linux/badge.svg
-[linux_link]: https://github.com/Mizux/java-native/actions?query=workflow%3A"Linux"
-[osx_svg]: https://github.com/Mizux/java-native/workflows/MacOS/badge.svg
-[osx_link]: https://github.com/Mizux/java-native/actions?query=workflow%3A"MacOS"
-[win_svg]: https://github.com/Mizux/java-native/workflows/Windows/badge.svg
-[win_link]: https://github.com/Mizux/java-native/actions?query=workflow%3A"Windows"
+[github_linux_status]: https://github.com/Mizux/java-native/actions/workflows/amd64_linux.yml/badge.svg
+[github_linux_link]: https://github.com/Mizux/java-native/actions/workflows/amd64_linux.yml
+[github_macos_status]: https://github.com/Mizux/java-native/actions/workflows/amd64_macos.yml/badge.svg
+[github_macos_link]: https://github.com/Mizux/java-native/actions/workflows/amd64_macos.yml
+[github_windows_status]: https://github.com/Mizux/java-native/actions/workflows/amd64_windows.yml/badge.svg
+[github_windows_link]: https://github.com/Mizux/java-native/actions/workflows/amd64_windows.yml
+[github_amd64_docker_status]: https://github.com/Mizux/java-native/actions/workflows/amd64_docker.yml/badge.svg
+[github_amd64_docker_link]: https://github.com/Mizux/java-native/actions/workflows/amd64_docker.yml
 
 # Introduction
+<nav for="project"> |
+<a href="#requirement">Requirement</a> |
+<a href="#codemap">Codemap</a> |
+<a href="#dependencies">Dependencies</a> |
+<a href="#build-process">Build</a> |
+<a href="ci/README.md">CI</a> |
+<a href="#appendices">Appendices</a> |
+<a href="#license">License</a> |
+</nav>
+
+This is an example of how to create a Modern [CMake](https://cmake.org/) C++/Java Project.
 
 This project aim to explain how you build a Java 1.8 native (for win32-x86-64,
-linux-x86-64 and darwin) maven multiple package using [`mvn`](http://maven.apache.org/)
+linux-x86-64 and darwin-x86-64) maven multiple package using [`mvn`](http://maven.apache.org/)
 and few [POM.xml](http://maven.apache.org/pom.html).  
-e.g. You have a cross platform C++ library and a JNI wrapper on it thanks to SWIG.  
-Then you want to provide a cross-platform Maven package to consume it in a Maven project...
+e.g. You have a cross platform C++ library and a JNI wrapper on it thanks to SWIG.<br>
+Then you want to provide a cross-platform Maven package to consume it in a
+Maven project...
 
-## Table of Content
-
-* [Requirement](#requirement)
-* [Directory Layout](#directory-layout)
-* [Build Process](#build-process)
-  * [Local Package](#local-package)
-    * [Building a native Package](#building-local-native-package)
-    * [Building a Local Package](#building-local-package)
-    * [Testing the Local Mizux.Foo Package](#testing-local-package)
-* [Appendices](#appendices)
-  * [Resources](#resources)
-* [Misc](#misc)
+This project should run on GNU/Linux, MacOS and Windows.
 
 ## Requirement
+You'll need:
 
-You'll need a "Java SDK >= 1.8" and "Maven >= 3.6".
+* "CMake >= 3.18".
+* "Java SDK >= 1.8" and "Maven >= 3.6".
 
-Please verify you have the `JAVA_HOME` environment variable set otherwise CMake
+Please verify you also have the `JAVA_HOME` environment variable set otherwise CMake
 and Maven won't be able to find your Java SDK.
 
-## Directory Layout
-
+## Codemap
 The project layout is as follow:
 
 * [CMakeLists.txt](CMakeLists.txt) Top-level for [CMake](https://cmake.org/cmake/help/latest/) based build.
 * [cmake](cmake) Subsidiary CMake files.
   * [java.cmake](cmake/java.cmake) All internall Java CMake stuff.
 
+* [ci](ci) Root directory for continuous integration.
+
 * [Foo](Foo) Root directory for `Foo` library.
   * [CMakeLists.txt](Foo/CMakeLists.txt) for `Foo`.
   * [include](Foo/include) public folder.
     * [foo](Foo/include/foo)
       * [Foo.hpp](Foo/include/foo/Foo.hpp)
+  * [src](Foo/src) private folder.
+    * [src/Foo.cpp](Foo/src/Foo.cpp)
   * [java](Foo/java)
     * [CMakeLists.txt](Foo/java/CMakeLists.txt) for `Foo` Java.
     * [foo.i](Foo/java/foo.i) SWIG Java wrapper.
-  * [src](Foo/src) private folder.
-    * [src/Foo.cpp](Foo/src/Foo.cpp)
+* [Bar](Bar) Root directory for `Bar` library.
+  * [CMakeLists.txt](Bar/CMakeLists.txt) for `Bar`.
+  * [include](Bar/include) public folder.
+    * [bar](Bar/include/bar)
+      * [Bar.hpp](Bar/include/bar/Bar.hpp)
+  * [src](Bar/src) private folder.
+    * [src/Bar.cpp](Bar/src/Bar.cpp)
+  * [java](Bar/java)
+    * [CMakeLists.txt](Bar/java/CMakeLists.txt) for `Bar` Java.
+    * [bar.i](Bar/java/bar.i) SWIG Java wrapper.
+* [FooBar](FooBar) Root directory for `FooBar` library.
+  * [CMakeLists.txt](FooBar/CMakeLists.txt) for `FooBar`.
+  * [include](FooBar/include) public folder.
+    * [foobar](FooBar/include/foobar)
+      * [FooBar.hpp](FooBar/include/foobar/FooBar.hpp)
+  * [src](FooBar/src) private folder.
+    * [src/FooBar.cpp](FooBar/src/FooBar.cpp)
+  * [java](FooBar/java)
+    * [CMakeLists.txt](FooBar/java/CMakeLists.txt) for `FooBar` Java.
+    * [foobar.i](FooBar/java/foobar.i) SWIG Java wrapper.
 
 * [java](java) Root directory for Java template files
   * [base.i](java/base.i) Generic SWIG stuff (e.g. fixing int64 java typemaps).
@@ -67,10 +92,16 @@ The project layout is as follow:
   * [Test.java](java/Test.java) Test source code to verify the Java wrapper is working.
   * [pom-test.xml.in](java/pom-test.xml.in) POM template to build the test project.
 
-* [ci](ci) Root directory for continuous integration.
+## Dependencies
+To complexify a little, the CMake project is composed of three libraries (Foo, Bar and FooBar)
+with the following dependencies:  
+```sh
+Foo:
+Bar:
+FooBar: PUBLIC Foo PRIVATE Bar
+```
 
 ## Build Process
-
 To Create a native dependent package we will split it in two parts:
 
 * A bunch of `org.mizux.javanative:javanative-{platform}` maven packages for each
@@ -116,7 +147,7 @@ If everything good the package (located in
    \-libjnijavanative.so
 ...
 ```
-note: `<platform>` could be `linux-x86-64`, `darwin` or `win32-x86-64`.
+note: `<platform>` could be `linux-x86-64`, `darwin-x86-64` or `win32-x86-64`.
 
 tips: since maven package are just zip archive you can use `unzip -l <package>.jar`
 to study their layout.
@@ -196,30 +227,35 @@ mvn exec:java -Dexec.mainClass="org.mizux.javanative.Test"
 ```
 
 ## Appendices
-
 Few links on the subject...
 
 ### Resources
+Project layout:
+* The Pitchfork Layout Revision 1 (cxx-pflR1)
 
+CMake:
+* https://llvm.org/docs/CMakePrimer.html
+* https://cliutils.gitlab.io/modern-cmake/
+* https://cgold.readthedocs.io/en/latest/
+
+Java:
 * [POM.xml reference](http://maven.apache.org/pom.html)
 * [Maven Central POM requirement](https://central.sonatype.org/pages/requirements.html)
 * [Javadoc Plugin](https://maven.apache.org/plugins/maven-javadoc-plugin/)
 * [Java Source Plugin](https://maven.apache.org/plugins/maven-source-plugin/)
 * [Java Native Access Project](https://github.com/java-native-access/jna)
 
-## Misc
-
+### Misc
 Image has been generated using [plantuml](http://plantuml.com/):
 ```bash
-plantuml -Tsvg doc/{file}.dot
+plantuml -Tsvg docs/{file}.dot
 ```
-So you can find the dot source files in [doc](doc).
+So you can find the dot source files in [docs](docs).
 
 ## License
-
 Apache 2. See the LICENSE file for details.
 
 ## Disclaimer
-
 This is not an official Google product, it is just code that happens to be
 owned by Google.
+
