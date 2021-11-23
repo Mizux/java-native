@@ -1,4 +1,4 @@
-name: MacOS
+name: amd64 macOS
 
 on:
   push:
@@ -13,14 +13,14 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Check cmake
-      run: cmake --version
     - name: Swig install
       run: brew install swig
     - name: Check swig
       run: swig -version
     - name: Check mvn
       run: mvn --version
+    - name: Check cmake
+      run: cmake --version
     - name: Configure
       run: cmake -S. -Bbuild -G "Xcode" -DCMAKE_CONFIGURATION_TYPES=Release -DSKIP_GPG=ON
     - name: Build
@@ -33,14 +33,14 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Check cmake
-      run: cmake --version
     - name: Swig install
       run: brew install swig
     - name: Check swig
       run: swig -version
     - name: Check mvn
       run: mvn --version
+    - name: Check cmake
+      run: cmake --version
     - name: Configure
       run: cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release -DSKIP_GPG=ON
     - name: Build
