@@ -25,6 +25,7 @@ if(CHECK_TYPE)
 endif()
 
 add_subdirectory(Foo)
+add_subdirectory(Bar)
 
 # Install
 include(GNUInstallDirs)
