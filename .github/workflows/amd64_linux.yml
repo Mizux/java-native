@@ -39,7 +39,7 @@ jobs:
     - name: Check cmake
       run: cmake --version
     - name: Configure
-      run: cmake -S. -Bbuild -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DSKIP_GPG=ON -DCMAKE_INSTALL_PREFIX=install
+      run: cmake -S. -Bbuild -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DSKIP_GPG=ON
     - name: Build
       run: cmake --build build --target all -v
     - name: Test
@@ -76,7 +76,7 @@ jobs:
     - name: Check cmake
       run: cmake --version
     - name: Configure
-      run: cmake -S. -Bbuild -G "Ninja Multi-Config" -DSKIP_GPG=ON -DCMAKE_INSTALL_PREFIX=install
+      run: cmake -S. -Bbuild -G "Ninja Multi-Config" -DCMAKE_INSTALL_PREFIX=install -DSKIP_GPG=ON
     - name: Build
       run: cmake --build build --config Release --target all -v
     - name: Test
@@ -109,7 +109,7 @@ jobs:
     - name: Check cmake
       run: cmake --version
     - name: Configure
-      run: cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release -DSKIP_GPG=ON -DCMAKE_INSTALL_PREFIX=install
+      run: cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DSKIP_GPG=ON
     - name: Build
       run: cmake --build build --target all -v
     - name: Test
