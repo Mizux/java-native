@@ -1,4 +1,4 @@
-name: Windows
+name: amd64 Windows
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   # Building using the github runner environement directly.
-  build:
+  visual-studio:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
@@ -25,7 +25,7 @@ jobs:
     - name: Check mvn
       run: mvn.cmd --version
     - name: Configure
-      run: cmake -S. -Bbuild -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DSKIP_GPG=ON
+      run: cmake -S. -Bbuild -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DSKIP_GPG=ON
     - name: Build
       run: cmake --build build --config Release --target ALL_BUILD -- /verbosity:normal /maxcpucount
     - name: Test
