@@ -79,7 +79,7 @@ endforeach()
 ##  Java Native Maven Package  ##
 #################################
 set(JAVA_NATIVE_PROJECT_PATH ${PROJECT_BINARY_DIR}/java/${JAVA_NATIVE_PROJECT})
-file(MAKE_DIRECTORY ${JAVA_NATIVE_PROJECT_PATH}/${JAVA_RESOURCES_PATH}/${JAVA_NATIVE_PROJECT})
+file(MAKE_DIRECTORY ${JAVA_NATIVE_PROJECT_PATH}/${JAVA_PACKAGE_RESOURCES_PATH}/${JAVA_NATIVE_PROJECT})
 
 configure_file(
   ${PROJECT_SOURCE_DIR}/java/pom-native.xml.in
@@ -94,9 +94,9 @@ add_custom_target(java_native_package
     $<$<NOT:$<PLATFORM_ID:Windows>>:$<TARGET_SONAME_FILE:Foo>>
     $<$<NOT:$<PLATFORM_ID:Windows>>:$<TARGET_SONAME_FILE:Bar>>
     $<$<NOT:$<PLATFORM_ID:Windows>>:$<TARGET_SONAME_FILE:FooBar>>
-    ${JAVA_RESOURCES_PATH}/${JAVA_NATIVE_PROJECT}/
+    ${JAVA_PACKAGE_RESOURCES_PATH}/${JAVA_NATIVE_PROJECT}/
   COMMAND ${MAVEN_EXECUTABLE} compile -B
-  COMMAND ${MAVEN_EXECUTABLE} package -B
+  COMMAND ${MAVEN_EXECUTABLE} package -B $<$<BOOL:${BUILD_FAT_JAR}>:-Dfatjar=true>
   COMMAND ${MAVEN_EXECUTABLE} install -B $<$<BOOL:${SKIP_GPG}>:-Dgpg.skip=true>
   BYPRODUCTS
     ${JAVA_NATIVE_PROJECT_PATH}/target
@@ -113,12 +113,28 @@ configure_file(
   ${JAVA_PROJECT_PATH}/pom.xml
   @ONLY)
 
+file(GLOB_RECURSE java_files RELATIVE ${PROJECT_SOURCE_DIR}/java "java/*.java")
+#message(WARNING "list: ${java_files}")
+set(JAVA_SRCS)
+foreach(JAVA_FILE IN LISTS java_files)
+  #message(STATUS "java: ${JAVA_FILE}")
+  set(JAVA_OUT ${JAVA_PROJECT_PATH}/${JAVA_PACKAGE_SRC_PATH}/${JAVA_FILE})
+  #message(STATUS "java out: ${JAVA_OUT}")
+  add_custom_command(
+    OUTPUT ${JAVA_OUT}
+    COMMAND ${CMAKE_COMMAND} -E copy
+      ${PROJECT_SOURCE_DIR}/java/${JAVA_FILE}
+      ${JAVA_OUT}
+      DEPENDS ${PROJECT_SOURCE_DIR}/java/${JAVA_FILE}
+    COMMENT "Copy Java file ${JAVA_FILE}"
+    VERBATIM)
+  list(APPEND JAVA_SRCS ${JAVA_OUT})
+endforeach()
+
 add_custom_target(java_package ALL
   DEPENDS
   ${JAVA_PROJECT_PATH}/pom.xml
-  COMMAND ${CMAKE_COMMAND} -E copy
-    ${PROJECT_SOURCE_DIR}/java/Loader.java
-    ${JAVA_PACKAGE_SRC_PATH}/
+  ${JAVA_SRCS}
   COMMAND ${MAVEN_EXECUTABLE} compile -B
   COMMAND ${MAVEN_EXECUTABLE} package -B $<$<BOOL:${BUILD_FAT_JAR}>:-Dfatjar=true>
   COMMAND ${MAVEN_EXECUTABLE} install -B $<$<BOOL:${SKIP_GPG}>:-Dgpg.skip=true>
@@ -146,7 +162,12 @@ function(add_java_test FILE_NAME)
   message(STATUS "build path: ${JAVA_TEST_PATH}/${JAVA_PACKAGE_TEST_PATH}")
   file(MAKE_DIRECTORY ${JAVA_TEST_PATH}/${JAVA_PACKAGE_TEST_PATH})
 
-  file(COPY ${FILE_NAME} DESTINATION ${JAVA_TEST_PATH}/${JAVA_PACKAGE_TEST_PATH})
+  add_custom_command(
+    OUTPUT ${JAVA_TEST_PATH}/${JAVA_PACKAGE_TEST_PATH}/${TEST_NAME}.java
+    COMMAND ${CMAKE_COMMAND} -E copy ${FILE_NAME} ${JAVA_TEST_PATH}/${JAVA_PACKAGE_TEST_PATH}
+    MAIN_DEPENDENCY ${FILE_NAME}
+    VERBATIM
+  )
 
   string(TOLOWER ${TEST_NAME} JAVA_TEST_PROJECT)
   configure_file(
@@ -192,7 +213,12 @@ function(add_java_example FILE_NAME)
   message(STATUS "build path: ${JAVA_EXAMPLE_PATH}/${JAVA_PACKAGE_SRC_PATH}")
   file(MAKE_DIRECTORY ${JAVA_EXAMPLE_PATH}/${JAVA_PACKAGE_SRC_PATH})
 
-  file(COPY ${FILE_NAME} DESTINATION ${JAVA_EXAMPLE_PATH}/${JAVA_PACKAGE_SRC_PATH})
+  add_custom_command(
+    OUTPUT ${JAVA_EXAMPLE_PATH}/${JAVA_PACKAGE_SRC_PATH}/${EXAMPLE_NAME}.java
+    COMMAND ${CMAKE_COMMAND} -E copy ${FILE_NAME} ${JAVA_EXAMPLE_PATH}/${JAVA_PACKAGE_SRC_PATH}
+    MAIN_DEPENDENCY ${FILE_NAME}
+    VERBATIM
+  )
 
   string(TOLOWER ${EXAMPLE_NAME} JAVA_EXAMPLE_PROJECT)
   set(JAVA_MAIN_CLASS "${JAVA_PACKAGE}.${COMPONENT_NAME}.${EXAMPLE_NAME}")

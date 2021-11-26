@@ -5,7 +5,7 @@ swig_add_library(jniFoo
   TYPE OBJECT
   LANGUAGE java
   OUTPUT_DIR
-  ${PROJECT_BINARY_DIR}/java/${JAVA_PROJECT}/${JAVA_PACKAGE_PATH}/foo
+  ${PROJECT_BINARY_DIR}/java/${JAVA_PROJECT}/${JAVA_PACKAGE_SRC_PATH}/foo
   SOURCES foo.i)
 
 set_target_properties(jniFoo PROPERTIES

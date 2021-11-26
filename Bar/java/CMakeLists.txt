@@ -5,7 +5,7 @@ swig_add_library(jniBar
   TYPE OBJECT
   LANGUAGE java
   OUTPUT_DIR
-  ${PROJECT_BINARY_DIR}/java/${JAVA_PROJECT}/${JAVA_PACKAGE_PATH}/bar
+  ${PROJECT_BINARY_DIR}/java/${JAVA_PROJECT}/${JAVA_PACKAGE_SRC_PATH}/bar
   SOURCES bar.i)
 
 set_target_properties(jniBar PROPERTIES

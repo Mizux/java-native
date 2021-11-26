@@ -1,6 +1,6 @@
 package org.mizux.javanative.examples;
 
-import com.google.ortools.Loader;
+import org.mizux.javanative.Loader;
 import org.mizux.javanative.bar.Bar;
 import org.mizux.javanative.foo.Foo;
 import org.mizux.javanative.foobar.FooBar;

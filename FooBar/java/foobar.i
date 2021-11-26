@@ -45,13 +45,13 @@ namespace foobar {
 %unignore FooBar::staticFunction(int);
 %unignore FooBar::staticFunction(int64_t);
 
-%unignore FooBar::getInt(int);
-%unignore FooBar::setBarInt() const;
-%unignore FooBar::setFooInt() const;
+%unignore FooBar::getInt() const;
+%unignore FooBar::setBarInt(int);
+%unignore FooBar::setFooInt(int);
 
-%unignore FooBar::getInt64(int64_t);
-%unignore FooBar::setBarInt64() const;
-%unignore FooBar::setFooInt64() const;
+%unignore FooBar::getInt64() const ;
+%unignore FooBar::setBarInt64(int64_t);
+%unignore FooBar::setFooInt64(int64_t);
 
 %rename ("toString") FooBar::operator();
 } // namespace foobar

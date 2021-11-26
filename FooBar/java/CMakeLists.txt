@@ -5,7 +5,7 @@ swig_add_library(jniFooBar
   TYPE OBJECT
   LANGUAGE java
   OUTPUT_DIR
-  ${PROJECT_BINARY_DIR}/java/${JAVA_PROJECT}/${JAVA_PACKAGE_PATH}/foobar
+  ${PROJECT_BINARY_DIR}/java/${JAVA_PROJECT}/${JAVA_PACKAGE_SRC_PATH}/foobar
   SOURCES foobar.i)
 
 set_target_properties(jniFooBar PROPERTIES
