@@ -72,7 +72,6 @@ endif()
 
 option(SKIP_GPG "Skip gpg sign" ON)
 message(STATUS "Maven skip GPG sign: ${SKIP_GPG}")
-
 include(java)
 
 add_subdirectory(tests)

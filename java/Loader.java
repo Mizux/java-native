@@ -41,8 +41,7 @@ public class Loader {
     void accept(Path path) throws T;
   }
 
-  /**
-   * Extract native resources in a temp directory.
+  /** Extract native resources in a temp directory.
    * @param resourceURI Native resource location.
    * @return The directory path containing all extracted libraries.
    */
