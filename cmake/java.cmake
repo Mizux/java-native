@@ -11,12 +11,9 @@ if(UNIX AND NOT APPLE)
   list(APPEND CMAKE_SWIG_FLAGS "-DSWIGWORDSIZE64")
 endif()
 
-# Find java
+# Find Java and JNI
 find_package(Java COMPONENTS Development REQUIRED)
-message(STATUS "Found Java: ${Java_JAVA_EXECUTABLE} (found version \"${Java_VERSION_STRING}\")")
-
 find_package(JNI REQUIRED)
-message(STATUS "Found JNI: ${JNI_FOUND}")
 
 # Find maven
 # On windows mvn spawn a process while mvn.cmd is a blocking command
@@ -31,7 +28,6 @@ else()
   message(STATUS "Found Maven: ${MAVEN_EXECUTABLE}")
 endif()
 
-# Swig wrap all libraries
 # Needed by java/CMakeLists.txt
 set(JAVA_DOMAIN_NAME "mizux")
 set(JAVA_DOMAIN_EXTENSION "org")
