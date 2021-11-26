@@ -70,7 +70,7 @@ if(WIN32)
   message(STATUS "Getting SWIG: ...DONE")
 endif()
 
-option(SKIP_GPG "Skip gpg sign" OFF)
+option(SKIP_GPG "Skip gpg sign" ON)
 message(STATUS "Maven skip GPG sign: ${SKIP_GPG}")
 
 include(java)
