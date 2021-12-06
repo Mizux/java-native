@@ -127,10 +127,10 @@ if(UNIVERSAL_JAVA_PACKAGE)
     ${JAVA_PROJECT_DIR}/pom.xml
     @ONLY)
 else()
-configure_file(
-  ${PROJECT_SOURCE_DIR}/java/pom-local.xml.in
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/java/pom-local.xml.in
     ${JAVA_PROJECT_DIR}/pom.xml
-  @ONLY)
+    @ONLY)
 endif()
 
 file(GLOB_RECURSE java_files RELATIVE ${PROJECT_SOURCE_DIR}/java "java/*.java")
