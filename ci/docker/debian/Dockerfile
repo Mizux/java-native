@@ -11,13 +11,14 @@ RUN apt-get update -qq \
 
 # Install swig
 RUN apt-get update -qq \
-&& apt-get install -yq libpcre3-dev \
+&& apt-get install -yq libpcre3-dev automake bison \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-RUN wget "https://downloads.sourceforge.net/project/swig/swig/swig-4.0.2/swig-4.0.2.tar.gz" \
+RUN wget -q "https://github.com/swig/swig/archive/refs/tags/v4.0.2.tar.gz" -O swig-4.0.2.tar.gz \
 && tar xvf swig-4.0.2.tar.gz \
 && rm swig-4.0.2.tar.gz \
 && cd swig-4.0.2 \
+&& ./autogen.sh \
 && ./configure --prefix=/usr \
 && make -j 4 \
 && make install \
@@ -55,7 +56,7 @@ RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file \
  -Dfile=javanative-java-1.0.jar
 
 FROM install_env AS install_devel
-WORKDIR /home/samples
+WORKDIR /home/sample
 COPY ci/samples .
 
 FROM install_devel AS install_build
