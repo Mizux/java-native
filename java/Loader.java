@@ -84,7 +84,7 @@ public class Loader {
     return tempPath;
   }
 
-  /** Unpack and Load the native libraries needed for using ortools-java.*/
+  /** Unpack and Load the native libraries needed for using javanative-java.*/
   private static boolean loaded = false;
 
   public static synchronized void loadNativeLibraries() {
