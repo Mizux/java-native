@@ -58,7 +58,7 @@ COPY . .
 # Build delivery
 FROM devel AS delivery
 
-ENV GPG_ARGS ""
+#ENV GPG_ARGS ""
 
 ARG PROJECT_TOKEN
 ENV PROJECT_TOKEN ${PROJECT_TOKEN}
