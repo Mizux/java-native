@@ -72,6 +72,12 @@ endif()
 
 option(SKIP_GPG "Skip gpg sign" ON)
 message(STATUS "Maven skip GPG sign: ${SKIP_GPG}")
+
+# On Centos-7 this option (needed otherwise) is unrecognized and should be
+# replaced by an empty string.
+set(GPG_ARGS "<arg>--pinentry-mode</arg><arg>loopback</arg>" CACHE STRING "Extra options for GPG")
+message(STATUS "Java: Add GPG options: ${GPG_ARGS}")
+
 include(java)
 
 add_subdirectory(tests)
