@@ -21,6 +21,7 @@ README.md
 doc
 
 # Native cmake build
+build.log
 export/
 build/
 build*/
