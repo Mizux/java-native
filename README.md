@@ -115,8 +115,8 @@ packages and containing the Java code.
 
 The pipeline for `linux-x86-64` should be as follow:  
 note: The pipeline will be similar for `darwin` and `win32-x86-64` architecture,
-don't hesitate to look at the CI log! ![Local Pipeline](doc/local_pipeline.svg)
-![Legend](doc/legend.svg)
+don't hesitate to look at the CI log! ![Local Pipeline](docs/local_pipeline.svg)
+![Legend](docs/legend.svg)
 
 #### Building local native Package
 
