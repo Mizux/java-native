@@ -22,8 +22,8 @@ jobs:
     - name: Configure
       run: cmake -S. -Bbuild -G "Visual Studio 17 2022" -DCMAKE_CONFIGURATION_TYPES=Release -DCMAKE_INSTALL_PREFIX=install -DSKIP_GPG=ON
     - name: Build
-      run: cmake --build build --config Release --target ALL_BUILD -v -- /verbosity:normal /maxcpucount
+      run: cmake --build build --config Release --target ALL_BUILD -v -- /verbosity:diag /maxcpucount
     - name: Test
-      run: cmake --build build --config Release --target RUN_TESTS -v -- /verbosity:normal /maxcpucount
+      run: cmake --build build --config Release --target RUN_TESTS -v -- /verbosity:diag /maxcpucount
     - name: Install
-      run: cmake --build build --config Release --target INSTALL -v -- /verbosity:normal /maxcpucount
+      run: cmake --build build --config Release --target INSTALL -v -- /verbosity:diag /maxcpucount
