@@ -33,7 +33,11 @@ e.g. You have a cross platform C++ library and a JNI wrapper on it thanks to SWI
 Then you want to provide a cross-platform Maven package to consume it in a
 Maven project...
 
-This project should run on GNU/Linux, MacOS and Windows.
+This project should run on:
+
+* MacOS (darwin-aarch64, darwin-x86-64)
+* GNU/Linux (linux-aarch64, linux-x86-64)
+* Windows (win32-x86-64)
 
 ## Requirement
 You'll need:
@@ -114,7 +118,7 @@ packages and containing the Java code.
 ### Local Package
 
 The pipeline for `linux-x86-64` should be as follow:  
-note: The pipeline will be similar for `darwin` and `win32-x86-64` architecture,
+note: The pipeline will be similar for other architecture,
 don't hesitate to look at the CI log! ![Local Pipeline](docs/local_pipeline.svg)
 ![Legend](docs/legend.svg)
 
@@ -173,7 +177,7 @@ Here some dev-note concerning this `POM.xml`.
   <dependency>
     <groupId>net.java.dev.jna</groupId>
     <artifactId>jna-platform</artifactId>
-    <version>5.5.0</version>
+    <version>5.8.0</version>
   </dependency>
   ```
 
