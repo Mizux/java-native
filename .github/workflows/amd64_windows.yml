@@ -60,13 +60,13 @@ jobs:
           cmake --build build
           --config ${{matrix.cmake.config}}
           --target ALL_BUILD
-          -v -- /verbosity:diag /maxcpucount
+          -v -j2
       - name: Test
         run: >
           cmake --build build
           --config ${{matrix.cmake.config}}
           --target RUN_TESTS
-          -v -- /verbosity:diag /maxcpucount
+          -v
       - name: Install
         run: >
           cmake --build build

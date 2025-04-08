@@ -1,7 +1,7 @@
 # ref: https://github.com/actions/runner-images
 name: amd64 macOS
 
-on: [push, pull_request,workflow_dispatch]
+on: [push, pull_request, workflow_dispatch]
 
 concurrency:
   group: ${{github.workflow}}-${{github.ref}}
@@ -11,12 +11,12 @@ concurrency:
 jobs:
   native:
     strategy:
-       matrix:
-         cmake: [
-           {generator: "Xcode", config: "Release", build: "ALL_BUILD", test: "RUN_TESTS", install: "install"},
-           {generator: "Unix Makefiles", config: "Release", build: "all", test: "test", install: "install"}
-         ]
-       fail-fast: false
+      matrix:
+        cmake: [
+          {generator: "Xcode", config: "Release", build: "ALL_BUILD", test: "RUN_TESTS", install: "install"},
+          {generator: "Unix Makefiles", config: "Release", build: "all", test: "test", install: "install"}
+        ]
+      fail-fast: false
     name: amd64•macOS•CMake(${{matrix.cmake.generator}},${{matrix.cmake.config}})
     runs-on: macos-latest
     steps:
