@@ -12,7 +12,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # Find Java and JNI
-find_package(Java 1.8 COMPONENTS Development REQUIRED)
+find_package(Java COMPONENTS Development REQUIRED)
 find_package(JNI REQUIRED)
 
 # Find maven
