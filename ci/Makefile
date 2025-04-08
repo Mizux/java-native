@@ -28,11 +28,13 @@ help:
 	@echo -e "\t${BOLD}clean_native${RESET}: Remove ALL cache and docker image."
 	@echo
 	@echo -e "\tWith ${BOLD}<distro>${RESET}:"
+	@echo -e "\t\t${BOLD}almalinux${RESET} (latest)"
 	@echo -e "\t\t${BOLD}alpine${RESET} (edge)"
 	@echo -e "\t\t${BOLD}archlinux${RESET} (latest)"
 	@echo -e "\t\t${BOLD}debian${RESET} (latest)"
 	@echo -e "\t\t${BOLD}fedora${RESET} (latest)"
 	@echo -e "\t\t${BOLD}opensuse${RESET} (tumbleweed)"
+	@echo -e "\t\t${BOLD}rockylinux${RESET} (9)"
 	@echo -e "\t\t${BOLD}ubuntu${RESET} (rolling)"
 	@echo
 	@echo -e "\tWith ${BOLD}<stage>${RESET}:"
@@ -65,22 +67,12 @@ help:
 	@echo -e "\te.g. 'make amd64_ubuntu_test'"
 	@echo -e "\tDocker image unavailable: arm64_archlinux"
 	@echo
-	@echo -e "\tBuild using a vagrant machine."
-	@echo -e "\t${BOLD}<vm>_<vms_stage>${RESET}: build the vagrant <vm> virtual machine."
-	@echo -e "\t${BOLD}clean_<vm>${RESET}: Remove virtual machine for the specified vm."
-	@echo -e "\t${BOLD}clean_vms${RESET}: Remove ALL vagrant box."
-	@echo
-	@echo -e "\t${BOLD}<vm>${RESET}:"
-	@echo -e "\t\t${BOLD}freebsd${RESET} (FreeBSD)"
-	@echo
-	@echo -e "\tWith ${BOLD}<vms_stage>${RESET}:"
-	@echo -e "\t\t${BOLD}build${RESET}"
-	@echo
 	@echo -e "\tGlobal targets."
 	@echo -e "\t${BOLD}clean${RESET}: Remove cache and ALL docker images."
 	@echo -e "\t${BOLD}distclean${RESET}: Remove everything."
 	@echo
 	@echo -e "\t${BOLD}NOCACHE=1${RESET}: use 'docker build --no-cache' when building container (default use cache)."
+	@echo -e "\t${BOLD}VERBOSE=1${RESET}: use 'docker build --progress=plain' when building container."
 	@echo
 	@echo -e "branch: $(BRANCH)"
 	@echo -e "sha1: $(SHA1)"
@@ -94,7 +86,7 @@ all: build
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES:
 # Remove some rules from gmake that .SUFFIXES does not remove.
-SUFFIXES =
+SUFFIXES :=
 # Keep all intermediate files
 # ToDo: try to remove it later
 .SECONDARY:
@@ -102,12 +94,15 @@ SUFFIXES =
 # Docker image name prefix.
 IMAGE := ${PROJECT}
 
-ifdef NOCACHE
-DOCKER_BUILD_CMD := docker build --no-cache
-DOCKER_BUILDX_CMD := docker buildx build --no-cache
-else
 DOCKER_BUILD_CMD := docker build
 DOCKER_BUILDX_CMD := docker buildx build
+ifdef NOCACHE
+DOCKER_BUILD_CMD := ${DOCKER_BUILD_CMD} --no-cache
+DOCKER_BUILDX_CMD := ${DOCKER_BUILDX_CMD} --no-cache
+endif
+ifdef VERBOSE
+DOCKER_BUILD_CMD := ${DOCKER_BUILD_CMD} --progress=plain
+DOCKER_BUILDX_CMD := ${DOCKER_BUILDX_CMD} --progress=plain
 endif
 DOCKER_RUN_CMD := docker run --rm --init --net=host
 
@@ -122,8 +117,8 @@ export/%:
 ## NATIVE ##
 ############
 # Currently supported distro
-DISTROS = alpine archlinux centos debian fedora opensuse ubuntu
-STAGES = env devel build test install_env install_devel install_build install_test
+DISTROS := almalinux alpine archlinux debian fedora opensuse rockylinux ubuntu
+STAGES := env devel build test install_env install_devel install_build install_test
 
 define make-stage-target =
 #$$(info STAGE: $1)
@@ -180,7 +175,9 @@ $(targets_export): %_export: %_build | export/%
 ##############
 ## PLATFORM ##
 ##############
-PLATFORMS = amd64 386 arm64 arm riscv64
+# ref: https://go.dev/doc/install/source#environment
+# ref: https://github.com/containerd/containerd/blob/269548fa27e0089a8b8278fc4fc781d7f65a939b/platforms/platforms.go#L80-L94
+PLATFORMS := amd64 386 arm64 arm riscv64
 
 define make-platform-stage-target =
 #$$(info PLATFORM: $1)
@@ -245,25 +242,6 @@ $(foreach platform,$(PLATFORMS),$(eval $(call make-platform-target,$(platform)))
 .PHONY: clean_platforms
 clean_platforms: $(addprefix clean_, $(PLATFORMS))
 
-#############
-## VAGRANT ##
-#############
-VMS = freebsd
-
-vms_targets = $(addsuffix _build, $(VMS))
-.PHONY: vms_build $(vms_targets)
-vms_build: $(vms_targets)
-$(vms_targets): %_build: vagrant/%/Vagrantfile
-	@cd vagrant/$* && vagrant destroy -f
-	cd vagrant/$* && vagrant up
-
-clean_vms_targets = $(addprefix clean_, $(VMS))
-.PHONY: clean_vms $(clean_vms_targets)
-clean_vms: $(clean_vms_targets)
-$(clean_vms_targets): clean_%:
-	cd vagrant/$* && vagrant destroy -f
-	-rm -rf vagrant/$*/.vagrant
-
 ###########
 ## CLEAN ##
 ###########
@@ -277,4 +255,3 @@ clean: clean_native clean_platforms
 distclean: clean
 	-docker container rm -f $$(docker container ls -aq)
 	-docker image rm -f $$(docker image ls -aq)
-	-vagrant box remove -f generic/freebsd12
