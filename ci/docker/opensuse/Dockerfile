@@ -19,7 +19,7 @@ RUN zypper update -y \
 RUN zypper update -y \
 && zypper install -y java-17-openjdk-devel maven \
 && zypper clean -a
-ENV PATH=/usr/share/maven/bin:$PATH
+ENV JAVA_HOME=/usr/lib64/jvm/java-17-openjdk
 
 # Add the library src to our build env
 FROM env AS devel

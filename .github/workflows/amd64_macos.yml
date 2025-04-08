@@ -12,11 +12,12 @@ jobs:
   native:
     strategy:
        matrix:
-         build: [
+         cmake: [
            {generator: "Xcode", config: "Release", build: "ALL_BUILD", test: "RUN_TESTS", install: "install"},
            {generator: "Unix Makefiles", config: "Release", build: "all", test: "test", install: "install"}
          ]
        fail-fast: false
+    name: amd64•macOS•CMake(${{matrix.cmake.generator}},${{matrix.cmake.config}})
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
