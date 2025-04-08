@@ -1,21 +1,30 @@
-message(STATUS "Getting SWIG: ...")
-
 # Download and unpack swig at configure time
-configure_file(${CMAKE_CURRENT_LIST_DIR}/CMakeLists.txt.swig swig-download/CMakeLists.txt)
-execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+message(CHECK_START "Fetching SWIG")
+list(APPEND CMAKE_MESSAGE_INDENT "  ")
+configure_file(
+  ${CMAKE_CURRENT_LIST_DIR}/SWIG.CMakeLists.txt.in
+  ${CMAKE_CURRENT_BINARY_DIR}/SWIG/CMakeLists.txt
+  @ONLY
+)
+
+execute_process(
+  COMMAND ${CMAKE_COMMAND} -H. -Bproject_build -G "${CMAKE_GENERATOR}"
   RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/swig-download )
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/SWIG)
 if(result)
-  message(FATAL_ERROR "CMake step for swig failed: ${result}")
-endif()
-execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/swig-download )
-if(result)
-  message(FATAL_ERROR "Build step for swig failed: ${result}")
+  message(FATAL_ERROR "CMake step for SWIG failed: ${result}")
 endif()
 
-# Define SWIG_EXECUTABLE (used as "hint" by FindSWIG)
-set(SWIG_EXECUTABLE ${CMAKE_BINARY_DIR}/swig/swig.exe)
+execute_process(
+  COMMAND ${CMAKE_COMMAND} --build project_build --config Release
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/SWIG)
+if(result)
+  message(FATAL_ERROR "Build step for SWIG failed: ${result}")
+endif()
 
-message(STATUS "Getting SWIG: ...DONE")
+set(SWIG_EXECUTABLE
+  ${CMAKE_CURRENT_BINARY_DIR}/SWIG/source/swig.exe
+  CACHE INTERNAL "swig.exe location" FORCE)
+list(POP_BACK CMAKE_MESSAGE_INDENT)
+message(CHECK_PASS "fetched")
