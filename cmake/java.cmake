@@ -12,7 +12,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # Find Java and JNI
-find_package(Java COMPONENTS Development REQUIRED)
+find_package(Java 1.8 COMPONENTS Development REQUIRED)
 find_package(JNI REQUIRED)
 
 # Find maven
@@ -85,6 +85,73 @@ set(JAVA_SRC_PATH src/main/java/${JAVA_DOMAIN_EXTENSION}/${JAVA_DOMAIN_NAME}/${J
 set(JAVA_TEST_PATH src/test/java/${JAVA_DOMAIN_EXTENSION}/${JAVA_DOMAIN_NAME}/${JAVA_ARTIFACT})
 set(JAVA_RESSOURCES_PATH src/main/resources)
 
+#################
+##  Java Test  ##
+#################
+# add_java_test()
+# CMake function to generate and build java test.
+# Parameters:
+#  the java filename
+# e.g.:
+# add_java_test(FooTests.java)
+function(add_java_test FILE_NAME)
+  if(NOT BUILD_TESTING)
+    return()
+  endif()
+
+  message(STATUS "Configuring test ${FILE_NAME}: ...")
+  get_filename_component(TEST_NAME ${FILE_NAME} NAME_WE)
+  get_filename_component(COMPONENT_DIR ${FILE_NAME} DIRECTORY)
+  get_filename_component(COMPONENT_NAME ${COMPONENT_DIR} NAME)
+
+  set(JAVA_TEST_DIR ${PROJECT_BINARY_DIR}/java/${COMPONENT_NAME}/${TEST_NAME})
+  message(STATUS "build path: ${JAVA_TEST_DIR}")
+
+  add_custom_command(
+    OUTPUT ${JAVA_TEST_DIR}/${JAVA_TEST_PATH}/${TEST_NAME}.java
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+    ${JAVA_TEST_DIR}/${JAVA_TEST_PATH}
+    COMMAND ${CMAKE_COMMAND} -E copy ${FILE_NAME} ${JAVA_TEST_DIR}/${JAVA_TEST_PATH}/
+    MAIN_DEPENDENCY ${FILE_NAME}
+    VERBATIM
+    )
+
+  string(TOLOWER ${TEST_NAME} JAVA_TEST_PROJECT)
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/java/pom-test.xml.in
+    ${JAVA_TEST_DIR}/pom.xml
+    @ONLY)
+
+  add_custom_command(
+    OUTPUT ${JAVA_TEST_DIR}/timestamp
+    COMMAND ${MAVEN_EXECUTABLE} compile -B
+    COMMAND ${CMAKE_COMMAND} -E touch ${JAVA_TEST_DIR}/timestamp
+    DEPENDS
+    ${JAVA_TEST_DIR}/pom.xml
+    ${JAVA_TEST_DIR}/${JAVA_TEST_PATH}/${TEST_NAME}.java
+    java_package
+    BYPRODUCTS
+    ${JAVA_TEST_DIR}/target
+    COMMENT "Compiling Java ${COMPONENT_NAME}/${TEST_NAME}.java (${JAVA_TEST_DIR}/timestamp)"
+    WORKING_DIRECTORY ${JAVA_TEST_DIR})
+
+  add_custom_target(java_${COMPONENT_NAME}_${TEST_NAME} ALL
+    DEPENDS
+    ${JAVA_TEST_DIR}/timestamp
+    WORKING_DIRECTORY ${JAVA_TEST_DIR})
+
+  add_test(
+    NAME java_${COMPONENT_NAME}_${TEST_NAME}
+    COMMAND ${MAVEN_EXECUTABLE} test
+    WORKING_DIRECTORY ${JAVA_TEST_DIR})
+  message(STATUS "Configuring test ${FILE_NAME}: ...DONE")
+endfunction()
+
+#####################
+##  JAVA WRAPPERS  ##
+#####################
+list(APPEND CMAKE_SWIG_FLAGS "-I${PROJECT_SOURCE_DIR}")
+
 # Swig wrap all libraries
 foreach(SUBPROJECT IN ITEMS Foo Bar FooBar)
   add_subdirectory(${SUBPROJECT}/java)
@@ -101,20 +168,31 @@ configure_file(
   ${JAVA_NATIVE_PROJECT_DIR}/pom.xml
   @ONLY)
 
+set(is_windows "$<PLATFORM_ID:Windows>")
+set(is_not_windows "$<NOT:$<PLATFORM_ID:Windows>>")
+
+
 add_custom_command(
   OUTPUT ${JAVA_NATIVE_PROJECT_DIR}/timestamp
+  COMMAND ${CMAKE_COMMAND} -E remove -f timestamp
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_RESSOURCES_PATH}/${JAVA_NATIVE_PROJECT}
   COMMAND ${CMAKE_COMMAND} -E copy
-    $<TARGET_FILE:jni${JAVA_ARTIFACT}>
     $<$<NOT:$<PLATFORM_ID:Windows>>:$<TARGET_SONAME_FILE:Foo>>
     $<$<NOT:$<PLATFORM_ID:Windows>>:$<TARGET_SONAME_FILE:Bar>>
     $<$<NOT:$<PLATFORM_ID:Windows>>:$<TARGET_SONAME_FILE:FooBar>>
     ${JAVA_RESSOURCES_PATH}/${JAVA_NATIVE_PROJECT}/
+
+  COMMAND ${CMAKE_COMMAND} -E copy
+    $<TARGET_FILE:jni${JAVA_ARTIFACT}>
+    ${JAVA_RESSOURCES_PATH}/${JAVA_NATIVE_PROJECT}/
+
   COMMAND ${MAVEN_EXECUTABLE} compile -B
   COMMAND ${MAVEN_EXECUTABLE} package -B $<$<BOOL:${BUILD_FAT_JAR}>:-Dfatjar=true>
   COMMAND ${MAVEN_EXECUTABLE} install -B $<$<BOOL:${SKIP_GPG}>:-Dgpg.skip=true>
   COMMAND ${CMAKE_COMMAND} -E touch ${JAVA_NATIVE_PROJECT_DIR}/timestamp
   DEPENDS
     ${JAVA_NATIVE_PROJECT_DIR}/pom.xml
+    jni${JAVA_ARTIFACT}
   BYPRODUCTS
     ${JAVA_NATIVE_PROJECT_DIR}/target
   COMMENT "Generate Java native package ${JAVA_NATIVE_PROJECT} (${JAVA_NATIVE_PROJECT_DIR}/timestamp)"
@@ -190,68 +268,6 @@ add_custom_target(java_deploy
   COMMAND ${MAVEN_EXECUTABLE} deploy
   WORKING_DIRECTORY ${JAVA_PROJECT_DIR})
 add_dependencies(java_deploy java_package)
-
-#################
-##  Java Test  ##
-#################
-if(BUILD_TESTING)
-  # add_java_test()
-  # CMake function to generate and build java test.
-  # Parameters:
-  #  the java filename
-  # e.g.:
-  # add_java_test(FooTests.java)
-  function(add_java_test FILE_NAME)
-    message(STATUS "Configuring test ${FILE_NAME}: ...")
-    get_filename_component(TEST_NAME ${FILE_NAME} NAME_WE)
-    get_filename_component(COMPONENT_DIR ${FILE_NAME} DIRECTORY)
-    get_filename_component(COMPONENT_NAME ${COMPONENT_DIR} NAME)
-
-    set(JAVA_TEST_DIR ${PROJECT_BINARY_DIR}/java/${COMPONENT_NAME}/${TEST_NAME})
-    message(STATUS "build path: ${JAVA_TEST_DIR}")
-
-    add_custom_command(
-      OUTPUT ${JAVA_TEST_DIR}/${JAVA_TEST_PATH}/${TEST_NAME}.java
-      COMMAND ${CMAKE_COMMAND} -E make_directory
-      ${JAVA_TEST_DIR}/${JAVA_TEST_PATH}
-      COMMAND ${CMAKE_COMMAND} -E copy
-      ${FILE_NAME}
-      ${JAVA_TEST_DIR}/${JAVA_TEST_PATH}/
-      MAIN_DEPENDENCY ${FILE_NAME}
-      VERBATIM
-      )
-
-    string(TOLOWER ${TEST_NAME} JAVA_TEST_PROJECT)
-    configure_file(
-      ${PROJECT_SOURCE_DIR}/java/pom-test.xml.in
-      ${JAVA_TEST_DIR}/pom.xml
-      @ONLY)
-
-    add_custom_command(
-      OUTPUT ${JAVA_TEST_DIR}/timestamp
-      COMMAND ${MAVEN_EXECUTABLE} compile -B
-      COMMAND ${CMAKE_COMMAND} -E touch ${JAVA_TEST_DIR}/timestamp
-      DEPENDS
-      ${JAVA_TEST_DIR}/pom.xml
-      ${JAVA_TEST_DIR}/${JAVA_TEST_PATH}/${TEST_NAME}.java
-      java_package
-      BYPRODUCTS
-      ${JAVA_TEST_DIR}/target
-      COMMENT "Compiling Java ${COMPONENT_NAME}/${TEST_NAME}.java (${JAVA_TEST_DIR}/timestamp)"
-      WORKING_DIRECTORY ${JAVA_TEST_DIR})
-
-    add_custom_target(java_${COMPONENT_NAME}_${TEST_NAME} ALL
-      DEPENDS
-      ${JAVA_TEST_DIR}/timestamp
-      WORKING_DIRECTORY ${JAVA_TEST_DIR})
-
-    add_test(
-      NAME java_${COMPONENT_NAME}_${TEST_NAME}
-      COMMAND ${MAVEN_EXECUTABLE} test
-      WORKING_DIRECTORY ${JAVA_TEST_DIR})
-    message(STATUS "Configuring test ${FILE_NAME}: ...DONE")
-  endfunction()
-endif()
 
 ####################
 ##  Java Example  ##
