@@ -171,15 +171,22 @@ configure_file(
 set(is_windows "$<PLATFORM_ID:Windows>")
 set(is_not_windows "$<NOT:$<PLATFORM_ID:Windows>>")
 
+set(is_shared "$<STREQUAL:$<TARGET_PROPERTY:Foo,TYPE>,SHARED_LIBRARY>")
+set(need_unix_lib "$<AND:${is_not_windows},${is_shared}>")
+set(need_windows_lib "$<AND:${is_windows},${is_shared}>")
 
 add_custom_command(
   OUTPUT ${JAVA_NATIVE_PROJECT_DIR}/timestamp
   COMMAND ${CMAKE_COMMAND} -E remove -f timestamp
   COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_RESSOURCES_PATH}/${JAVA_NATIVE_PROJECT}
-  COMMAND ${CMAKE_COMMAND} -E copy
-    $<$<NOT:$<PLATFORM_ID:Windows>>:$<TARGET_SONAME_FILE:Foo>>
-    $<$<NOT:$<PLATFORM_ID:Windows>>:$<TARGET_SONAME_FILE:Bar>>
-    $<$<NOT:$<PLATFORM_ID:Windows>>:$<TARGET_SONAME_FILE:FooBar>>
+  COMMAND ${CMAKE_COMMAND} -E
+    $<IF:${is_shared},copy,true>
+    $<${need_unix_lib}:$<TARGET_SONAME_FILE:Foo>>
+    $<${need_unix_lib}:$<TARGET_SONAME_FILE:Bar>>
+    $<${need_unix_lib}:$<TARGET_SONAME_FILE:FooBar>>
+    $<${need_windows_lib}:$<TARGET_FILE:Foo>>
+    $<${need_windows_lib}:$<TARGET_FILE:Bar>>
+    $<${need_windows_lib}:$<TARGET_FILE:FooBar>>
     ${JAVA_RESSOURCES_PATH}/${JAVA_NATIVE_PROJECT}/
 
   COMMAND ${CMAKE_COMMAND} -E copy
