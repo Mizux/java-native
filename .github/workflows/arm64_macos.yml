@@ -1,5 +1,5 @@
 # ref: https://github.com/actions/runner-images
-name: amd64 MacOS
+name: arm64 MacOS
 
 on: [push, pull_request, workflow_dispatch]
 
@@ -17,8 +17,8 @@ jobs:
           {name: "Make", generator: "Unix Makefiles", config: Release, build: all, test: test, install: install}
         ]
       fail-fast: false
-    name: amd64•MacOS•CMake(${{matrix.cmake.name}})
-    runs-on: macos-15-intel
+    name: arm64•MacOS•CMake(${{matrix.cmake.name}})
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
       - name: Install SWIG
