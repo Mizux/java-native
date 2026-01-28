@@ -6,26 +6,25 @@ FROM rockylinux/rockylinux:9 AS env
 ENV PATH=/usr/local/bin:$PATH
 RUN dnf -y update \
 && dnf -y install git wget openssl-devel cmake \
-&& dnf -y groupinstall "Development Tools" \
+&& dnf -y group install "Development Tools" \
 && dnf clean all \
 && rm -rf /var/cache/dnf
 CMD [ "/usr/bin/bash" ]
 
-# Install SWIG 4.2.1
+# Install SWIG 4.3.0
 RUN dnf -y update \
 && dnf -y install pcre2-devel \
 && dnf clean all \
 && rm -rf /var/cache/dnf \
-&& wget -q "https://github.com/swig/swig/archive/refs/tags/v4.2.1.tar.gz" -O swig-4.2.1.tar.gz \
-&& tar xvf swig-4.2.1.tar.gz \
-&& rm swig-4.2.1.tar.gz \
-&& cd swig-4.2.1 \
-&& ./autogen.sh \
+&& wget -q "https://downloads.sourceforge.net/project/swig/swig/swig-4.3.0/swig-4.3.0.tar.gz" \
+&& tar xvf swig-4.3.0.tar.gz \
+&& rm swig-4.3.0.tar.gz \
+&& cd swig-4.3.0 \
 && ./configure --prefix=/usr \
 && make -j 4 \
 && make install \
 && cd .. \
-&& rm -rf swig-4.2.1
+&& rm -rf swig-4.3.0
 
 # Install Java
 RUN dnf -y update \
@@ -47,7 +46,7 @@ RUN cmake --build build --target all -v
 RUN cmake --build build --target install -v
 
 FROM build AS test
-RUN cmake --build build --target test -v
+RUN CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test -v
 
 # Test install rules
 FROM env AS install_env
@@ -60,7 +59,7 @@ RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file \
  -Dfile=javanative-java-1.0.jar
 
 FROM install_env AS install_devel
-COPY ci/samples .
+COPY ci/sample .
 
 FROM install_devel AS install_build
 RUN mvn compile

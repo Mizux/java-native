@@ -4,7 +4,7 @@ FROM opensuse/tumbleweed AS env
 
 # Install system build dependencies
 ENV PATH=/usr/local/bin:$PATH
-RUN zypper refresh \
+RUN zypper update -y \
 && zypper install -y git patch gcc gcc-c++ cmake \
 && zypper clean -a
 ENV CC=gcc CXX=g++
@@ -35,6 +35,7 @@ RUN cmake --build build --target install -v
 FROM build AS test
 RUN CTEST_OUTPUT_ON_FAILURE=1 cmake --build build --target test -v
 
+# Test install rules
 FROM env AS install_env
 WORKDIR /home/sample
 COPY --from=build /home/project/build/java/javanative-linux-x86-64/target/*.jar ./
@@ -45,7 +46,7 @@ RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file \
  -Dfile=javanative-java-1.0.jar
 
 FROM install_env AS install_devel
-COPY ci/samples .
+COPY ci/sample .
 
 FROM install_devel AS install_build
 RUN mvn compile

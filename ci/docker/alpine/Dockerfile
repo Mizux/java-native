@@ -5,7 +5,6 @@ FROM alpine:edge AS env
 # Install system build dependencies
 ENV PATH=/usr/local/bin:$PATH
 RUN apk add --no-cache git build-base linux-headers cmake
-CMD [ "/bin/sh" ]
 
 # Install swig
 RUN apk add --no-cache swig
@@ -39,7 +38,7 @@ RUN mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file \
  -Dfile=javanative-java-1.0.jar
 
 FROM install_env AS install_devel
-COPY ci/samples .
+COPY ci/sample .
 
 FROM install_devel AS install_build
 RUN mvn compile
