@@ -17,9 +17,9 @@ RUN zypper update -y \
 
 # Java install
 RUN zypper update -y \
-&& zypper install -y java-17-openjdk-devel maven \
+&& zypper install -y java-21-openjdk-devel maven \
 && zypper clean -a
-ENV JAVA_HOME=/usr/lib64/jvm/java-17-openjdk
+ENV JAVA_HOME=/usr/lib64/jvm/java-21-openjdk
 
 # Add the library src to our build env
 FROM env AS devel

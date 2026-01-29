@@ -10,8 +10,8 @@ RUN apk add --no-cache git build-base linux-headers cmake
 RUN apk add --no-cache swig
 
 # Install java
-RUN apk add --no-cache openjdk8 maven
-ENV JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk
+RUN apk add --no-cache openjdk21 maven
+ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk
 
 # Add the library src to our build env
 FROM env AS devel
